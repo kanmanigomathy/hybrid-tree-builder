@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PhyloBuilder</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            🧬 <span>PhyloBuilder</span>
+        </div>
+
+        <nav>
+            <a class="active">⌂ Home</a>
+            <a>📁 Upload</a>
+            <a>🧬 Alignment</a>
+            <a>🌳 Tree Builder</a>
+            <a>📊 Bootstrap</a>
+            <a>🔬 Visualization</a>
+            <a>📈 Results</a>
+            <a>📤 Export</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <small>Bioinformatics Capstone</small>
+        </div>
+
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <p class="small-title">BIOINFORMATICS PLATFORM</p>
+
+                <h1>
+                    Hybrid Phylogenetic
+                    Tree Builder
+                </h1>
+            </div>
+
+            <div class="status">
+                ● Ready
+            </div>
+
+        </header>
+
+
+        <!-- Hero -->
+        <section class="hero">
+
+            <div class="hero-text">
+
+                <span class="badge">
+                    Phylogenetic Analysis
+                </span>
+
+                <h2>
+                    Build, evaluate and explore
+                    evolutionary relationships.
+                </h2>
+
+                <p>
+                    Analyze DNA, RNA or protein FASTA sequences,
+                    construct a hybrid phylogenetic tree, estimate
+                    bootstrap confidence and visualize the results
+                    interactively.
+                </p>
+
+                <button onclick="scrollToUpload()">
+                    Start Analysis →
+                </button>
+
+            </div>
+
+            <div class="hero-visual">
+
+                <div class="tree-line">
+                    <span>●</span>
+                    <span>Human</span>
+                </div>
+
+                <div class="tree-line">
+                    <span>●</span>
+                    <span>Chimpanzee</span>
+                </div>
+
+                <div class="tree-line">
+                    <span>●</span>
+                    <span>Gorilla</span>
+                </div>
+
+                <div class="confidence">
+                    Bootstrap confidence
+                    <strong>96%</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Workflow -->
+        <section class="workflow">
+
+            <h2>Analysis Workflow</h2>
+
+            <div class="workflow-grid">
+
+                <div class="workflow-card">
+                    <span>01</span>
+                    <h3>Upload</h3>
+                    <p>Provide biological FASTA sequences.</p>
+                </div>
+
+                <div class="workflow-card">
+                    <span>02</span>
+                    <h3>Validate</h3>
+                    <p>Check sequence format and quality.</p>
+                </div>
+
+                <div class="workflow-card">
+                    <span>03</span>
+                    <h3>Align</h3>
+                    <p>Prepare sequences for phylogenetic analysis.</p>
+                </div>
+
+                <div class="workflow-card">
+                    <span>04</span>
+                    <h3>Build Tree</h3>
+                    <p>Combine NJ and ML analysis.</p>
+                </div>
+
+                <div class="workflow-card">
+                    <span>05</span>
+                    <h3>Bootstrap</h3>
+                    <p>Estimate branch confidence.</p>
+                </div>
+
+                <div class="workflow-card">
+                    <span>06</span>
+                    <h3>Visualize</h3>
+                    <p>Explore the final tree interactively.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Upload -->
+        <section id="upload-section" class="upload-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="small-title">STEP 01</p>
+                    <h2>Upload Sequences</h2>
+                </div>
+
+                <span class="help">?</span>
+
+            </div>
+
+
+            <div class="upload-box">
+
+                <div class="upload-icon">
+                    🧬
+                </div>
+
+                <h3>
+                    Upload your FASTA file
+                </h3>
+
+                <p>
+                    Supported sequence types:
+                    DNA, RNA and protein
+                </p>
+
+                <label class="file-button">
+
+                    Choose FASTA File
+
+                    <input
+                        type="file"
+                        id="fastaFile"
+                        accept=".fasta,.fa,.faa,.fna"
+                        onchange="showFileName()">
+
+                </label>
+
+                <p id="fileName">
+                    No file selected
+                </p>
+
+                <button
+                    class="validate-button"
+                    onclick="validateFile()">
+
+                    Validate Sequences
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- Results -->
+        <section id="results" class="results-section hidden">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="small-title">VALIDATION</p>
+                    <h2>Sequence Information</h2>
+                </div>
+
+            </div>
+
+
+            <div class="stats">
+
+                <div class="stat-card">
+                    <span>Sequences</span>
+                    <strong id="sequenceCount">0</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Sequence Type</span>
+                    <strong id="sequenceType">Detecting...</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Total Length</span>
+                    <strong id="totalLength">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sequence Name</th>
+                            <th>Length</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="sequenceTable">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
