@@ -1,16 +1,22 @@
 // ============================================================
-// PHYLOBUIDER - MAIN JAVASCRIPT
-// FASTA Validation → Alignment → Neighbor Joining
+// PHYLOBUILDER
+// MULTIPLE FASTA + ALIGNMENT + COLOUR DISPLAY
 // ============================================================
 
 
+let validated = false;
+
+
 // ============================================================
-// SCROLL TO UPLOAD
+// SCROLL
 // ============================================================
 
 function scrollToUpload() {
 
-    const section = document.getElementById("upload-section");
+    const section =
+        document.getElementById(
+            "upload-section"
+        );
 
     if (section) {
 
@@ -23,103 +29,299 @@ function scrollToUpload() {
 
 
 // ============================================================
-// SHOW SELECTED FILE NAME
+// GET FILES
 // ============================================================
 
-function showFileName() {
+function getFiles() {
 
-    const fileInput =
-        document.getElementById("fastaFile");
+    const input =
+        document.getElementById(
+            "fastaFile"
+        );
 
-    const fileName =
-        document.getElementById("fileName");
+    if (!input) {
 
-    if (!fileInput || !fileName) {
-        return;
-    }
-
-    if (fileInput.files.length > 0) {
-
-        fileName.textContent =
-            "Selected: " +
-            fileInput.files[0].name;
-
-    } else {
-
-        fileName.textContent =
-            "No file selected";
+        return [];
 
     }
+
+    return Array.from(
+        input.files
+    );
 }
 
 
 // ============================================================
-// FASTA VALIDATION
+// SHOW SELECTED FILES
 // ============================================================
 
-async function validateFile() {
+function showFileName() {
 
-    const fileInput =
-        document.getElementById("fastaFile");
+    const files = getFiles();
 
-    if (!fileInput || fileInput.files.length === 0) {
+    const fileName =
+        document.getElementById(
+            "fileName"
+        );
 
-        alert("Please select a FASTA file.");
+    const selectedFiles =
+        document.getElementById(
+            "selectedFiles"
+        );
 
-        return;
+    const alignBtn =
+        document.getElementById(
+            "alignBtn"
+        );
+
+    const njBtn =
+        document.getElementById(
+            "njBtn"
+        );
+
+
+    validated = false;
+
+
+    if (alignBtn) {
+
+        alignBtn.disabled = true;
+
     }
 
+
+    if (njBtn) {
+
+        njBtn.disabled = true;
+
+    }
+
+
+    if (files.length === 0) {
+
+        fileName.textContent =
+            "No files selected";
+
+        selectedFiles.innerHTML = "";
+
+        return;
+
+    }
+
+
+    fileName.textContent =
+        files.length +
+        " FASTA file" +
+        (files.length > 1 ? "s" : "") +
+        " selected";
+
+
+    selectedFiles.innerHTML =
+        files.map(
+            function(file, index) {
+
+                return `
+                    <div class="file-chip">
+                        ${index + 1}.
+                        ${escapeHTML(file.name)}
+                    </div>
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+// ============================================================
+// FORM DATA
+// ============================================================
+
+function createFormData() {
 
     const formData =
         new FormData();
 
-    formData.append(
-        "file",
-        fileInput.files[0]
+    const files =
+        getFiles();
+
+
+    files.forEach(
+        function(file) {
+
+            formData.append(
+                "files",
+                file
+            );
+
+        }
     );
+
+
+    return formData;
+}
+
+
+// ============================================================
+// VALIDATE
+// ============================================================
+
+async function validateFiles() {
+
+    const files =
+        getFiles();
+
+    const status =
+        document.getElementById(
+            "validationStatus"
+        );
+
+
+    if (files.length === 0) {
+
+        status.innerHTML = `
+            <div class="error-box">
+                <h3>Validation Failed</h3>
+                <p>
+                    Please select at least one FASTA file.
+                </p>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    status.innerHTML = `
+        <div class="loading">
+            Validating FASTA files...
+        </div>
+    `;
 
 
     try {
 
         const response =
-            await fetch("/validate", {
-
-                method: "POST",
-
-                body: formData
-
-            });
+            await fetch(
+                "/validate",
+                {
+                    method: "POST",
+                    body: createFormData()
+                }
+            );
 
 
         const data =
             await response.json();
 
 
-        if (!data.success) {
+        if (
+            !response.ok ||
+            !data.success
+        ) {
 
-            alert(
-                data.errors
-                    ? data.errors.join("\n")
-                    : data.message || "Validation failed."
+            const message =
+                data.message ||
+                (
+                    data.errors
+                        ? data.errors.join("<br>")
+                        : "Validation failed."
+                );
+
+
+            throw new Error(
+                message
             );
 
-            return;
         }
 
 
-        displayResults(data);
+        const stats =
+            data.statistics;
 
 
-        // Enable alignment button
-        const alignBtn =
-            document.getElementById("alignBtn");
+        // IMPORTANT:
+        // The Flask API returns
+        // statistics.number_of_sequences
+        // NOT data.count.
 
-        if (alignBtn) {
-            alignBtn.disabled = false;
-        }
+
+        document.getElementById(
+            "sequenceCount"
+        ).textContent =
+            stats.number_of_sequences;
+
+
+        document.getElementById(
+            "sequenceType"
+        ).textContent =
+            stats.sequence_type;
+
+
+        document.getElementById(
+            "totalLength"
+        ).textContent =
+            stats.total_length;
+
+
+        document.getElementById(
+            "fileCount"
+        ).textContent =
+            stats.number_of_files;
+
+
+        document.getElementById(
+            "summarySequences"
+        ).textContent =
+            stats.number_of_sequences;
+
+
+        status.innerHTML = `
+            <div class="success-box">
+
+                <h3>
+                    ✓ FASTA Validation Successful
+                </h3>
+
+                <p>
+                    ${stats.number_of_sequences}
+                    valid sequences detected.
+                </p>
+
+                <p>
+                    Files:
+                    ${stats.number_of_files}
+                </p>
+
+                ${
+                    data.warnings &&
+                    data.warnings.length
+                    ?
+                    `
+                    <small>
+                        ${escapeHTML(
+                            data.warnings.join(" | ")
+                        )}
+                    </small>
+                    `
+                    :
+                    ""
+                }
+
+            </div>
+        `;
+
+
+        validated = true;
+
+
+        document.getElementById(
+            "alignBtn"
+        ).disabled = false;
+
 
     }
-
     catch (error) {
 
         console.error(
@@ -127,182 +329,41 @@ async function validateFile() {
             error
         );
 
-        alert(
-            "Unable to connect to the Flask server."
-        );
+
+        status.innerHTML = `
+            <div class="error-box">
+
+                <h3>
+                    Validation Failed
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
+
+            </div>
+        `;
 
     }
+
 }
 
 
 // ============================================================
-// DISPLAY VALIDATION RESULTS
-// ============================================================
-
-function displayResults(data) {
-
-    const results =
-        document.getElementById("results");
-
-    const sequenceCount =
-        document.getElementById("sequenceCount");
-
-    const table =
-        document.getElementById("sequenceTable");
-
-    const totalLength =
-        document.getElementById("totalLength");
-
-
-    if (results) {
-
-        results.classList.remove("hidden");
-
-    }
-
-
-    if (sequenceCount) {
-
-        sequenceCount.textContent =
-            data.count;
-
-    }
-
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = "";
-
-
-    let total =
-        0;
-
-
-    data.sequences.forEach(
-        (seq, index) => {
-
-            total +=
-                seq.length;
-
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${index + 1}
-                </td>
-
-                <td>
-                    ${escapeHTML(seq.name)}
-                </td>
-
-                <td>
-                    ${seq.length}
-                </td>
-
-            `;
-
-
-            table.appendChild(row);
-
-        }
-    );
-
-
-    if (totalLength) {
-
-        totalLength.textContent =
-            total;
-
-    }
-
-
-    detectSequenceType(
-        data.sequences
-    );
-}
-
-
-// ============================================================
-// DETECT DNA / RNA / PROTEIN
-// ============================================================
-
-function detectSequenceType(sequences) {
-
-    const dnaChars =
-        /^[ACGTN]+$/i;
-
-    const rnaChars =
-        /^[ACGUN]+$/i;
-
-
-    let type =
-        "Protein";
-
-
-    const allDNA =
-        sequences.every(
-            seq =>
-                dnaChars.test(
-                    seq.sequence
-                )
-        );
-
-
-    const allRNA =
-        sequences.every(
-            seq =>
-                rnaChars.test(
-                    seq.sequence
-                )
-        );
-
-
-    if (allDNA) {
-
-        type =
-            "DNA";
-
-    }
-
-    else if (allRNA) {
-
-        type =
-            "RNA";
-
-    }
-
-
-    const typeBox =
-        document.getElementById(
-            "sequenceType"
-        );
-
-
-    if (typeBox) {
-
-        typeBox.textContent =
-            type;
-
-    }
-}
-
-
-// ============================================================
-// MULTIPLE SEQUENCE ALIGNMENT
+// RUN ALIGNMENT
 // ============================================================
 
 async function runAlignment() {
 
-    const fileInput =
+    const files =
+        getFiles();
+
+
+    const preview =
         document.getElementById(
-            "fastaFile"
+            "alignmentPreview"
         );
 
 
@@ -312,503 +373,517 @@ async function runAlignment() {
         );
 
 
-    const previewBox =
+    const meta =
         document.getElementById(
-            "alignmentPreview"
+            "alignmentMeta"
         );
 
 
-    const alignBtn =
+    const button =
         document.getElementById(
             "alignBtn"
         );
 
 
-    // --------------------------------------------------------
-    // CHECK FILE
-    // --------------------------------------------------------
-
-    if (
-        !fileInput ||
-        fileInput.files.length === 0
-    ) {
-
-        alert(
-            "Please select a FASTA file first."
-        );
-
-        return;
-    }
-
-
-    // --------------------------------------------------------
-    // DISABLE BUTTON
-    // --------------------------------------------------------
-
-    if (alignBtn) {
-
-        alignBtn.disabled =
-            true;
-
-    }
-
-
-    // --------------------------------------------------------
-    // SHOW LOADING
-    // --------------------------------------------------------
-
-    if (resultBox) {
+    if (files.length === 0) {
 
         resultBox.innerHTML = `
-
-            <div class="loading">
+            <div class="error-box">
 
                 <h3>
-                    Running Multiple Sequence Alignment...
+                    Alignment Failed
                 </h3>
 
                 <p>
-                    Please wait.
+                    Please select FASTA files first.
                 </p>
 
             </div>
-
         `;
+
+        return;
 
     }
 
 
-    if (previewBox) {
-
-        previewBox.innerHTML = `
-
-            <div class="loading">
-
-                Running alignment...
-
-            </div>
-
-        `;
-
-    }
+    button.disabled = true;
 
 
-    // --------------------------------------------------------
-    // CREATE FORM DATA
-    // --------------------------------------------------------
-
-    const formData =
-        new FormData();
-
-
-    formData.append(
-        "file",
-        fileInput.files[0]
-    );
+    preview.innerHTML = `
+        <div class="loading">
+            Running Multiple Sequence Alignment...
+        </div>
+    `;
 
 
     try {
-
-        console.log(
-            "Sending FASTA file:",
-            fileInput.files[0].name
-        );
-
-
-        // ----------------------------------------------------
-        // SEND FILE TO FLASK
-        // ----------------------------------------------------
 
         const response =
             await fetch(
                 "/align",
                 {
-
                     method: "POST",
-
-                    body: formData
-
+                    body: createFormData()
                 }
             );
 
 
-        console.log(
-            "Alignment HTTP status:",
-            response.status
-        );
+        const data =
+            await response.json();
 
 
-        // ----------------------------------------------------
-        // READ RESPONSE
-        // ----------------------------------------------------
+        if (
+            !response.ok ||
+            !data.success
+        ) {
 
-        const responseText =
-            await response.text();
-
-
-        console.log(
-            "Alignment server response:",
-            responseText
-        );
-
-
-        let data;
-
-
-        try {
-
-            data =
-                JSON.parse(
-                    responseText
+            const message =
+                data.message ||
+                (
+                    data.errors
+                        ? data.errors.join("<br>")
+                        : "Alignment failed."
                 );
 
-        }
-
-        catch (jsonError) {
 
             throw new Error(
-                "Flask returned an invalid response: " +
-                responseText
+                message
             );
 
         }
 
 
-        // ----------------------------------------------------
-        // CHECK ALIGNMENT SUCCESS
-        // ----------------------------------------------------
-
-        if (!data.success) {
-
-            const message =
-                data.message ||
-                data.error ||
-                "Alignment failed.";
-
-
-            if (resultBox) {
-
-                resultBox.innerHTML = `
-
-                    <div class="error-box">
-
-                        <h3>
-                            Alignment Failed
-                        </h3>
-
-                        <p>
-                            ${escapeHTML(message)}
-                        </p>
-
-                    </div>
-
-                `;
-
-            }
+        // ====================================================
+        // ALIGNMENT IS AN ARRAY
+        //
+        // Example:
+        //
+        // [
+        //   {
+        //      name: "Human",
+        //      sequence: "ATGC..."
+        //   }
+        // ]
+        // ====================================================
 
 
-            if (previewBox) {
-
-                previewBox.innerHTML = `
-
-                    <div class="error-box">
-
-                        <strong>
-                            Alignment Failed
-                        </strong>
-
-                        <p>
-                            ${escapeHTML(message)}
-                        </p>
-
-                    </div>
-
-                `;
-
-            }
+        const alignment =
+            data.alignment;
 
 
-            return;
-        }
+        if (
+            !alignment ||
+            !Array.isArray(alignment)
+        ) {
 
-
-        // ----------------------------------------------------
-        // BUILD ALIGNMENT DISPLAY
-        // ----------------------------------------------------
-
-        let alignmentHTML = "";
-
-if (data.alignment) {
-
-    // Flask returns alignment as an array
-    if (Array.isArray(data.alignment)) {
-
-        data.alignment.forEach(seq => {
-
-            alignmentHTML += `
-                <div class="alignment-row">
-                    <strong>${escapeHTML(seq.name)}</strong>
-                    &nbsp;&nbsp;
-                    ${escapeHTML(seq.sequence)}
-                </div>
-            `;
-
-        });
-
-    }
-
-    // Backup in case Flask returns a string
-    else if (typeof data.alignment === "string") {
-
-        const lines = data.alignment
-            .split("\n")
-            .filter(line => line.trim() !== "");
-
-        lines.forEach(line => {
-
-            alignmentHTML += `
-                <div class="alignment-row">
-                    ${escapeHTML(line)}
-                </div>
-            `;
-
-        });
-
-    }
-
-}
-
-
-        // ----------------------------------------------------
-        // SHOW ALIGNMENT PREVIEW
-        // ----------------------------------------------------
-
-        if (previewBox) {
-
-            previewBox.innerHTML = `
-
-                <div class="success-box">
-
-                    <h3>
-                        ✓ Multiple Sequence Alignment Completed
-                    </h3>
-
-
-                    <div class="alignment-summary">
-
-                        <p>
-                            <strong>
-                                Number of sequences:
-                            </strong>
-
-                            ${data.number_of_sequences}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Alignment length:
-                            </strong>
-
-                            ${data.alignment_length}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Execution time:
-                            </strong>
-
-                            ${data.execution_time}
-                            seconds
-                        </p>
-
-                    </div>
-
-
-                    <h4>
-                        Alignment
-                    </h4>
-
-
-                    <div class="alignment-box">
-
-                        ${alignmentHTML}
-
-                    </div>
-
-                </div>
-
-            `;
+            throw new Error(
+                "No alignment data returned by the server."
+            );
 
         }
 
 
-        // ----------------------------------------------------
-        // SHOW RESULT CARD
-        // ----------------------------------------------------
-
-        if (resultBox) {
-
-            resultBox.innerHTML = `
-
-                <div class="result-card">
-
-                    <h3>
-                        ✓ Alignment Completed Successfully
-                    </h3>
+        renderAlignment(
+            alignment
+        );
 
 
-                    <p>
-
-                        <strong>
-                            Number of sequences:
-                        </strong>
-
-                        ${data.number_of_sequences}
-
-                    </p>
+        meta.textContent =
+            data.number_of_sequences +
+            " sequences | " +
+            data.alignment_length +
+            " positions | " +
+            data.execution_time +
+            " seconds";
 
 
-                    <p>
+        resultBox.innerHTML = `
+            <div class="result-card">
 
-                        <strong>
-                            Alignment length:
-                        </strong>
+                <h3>
+                    ✓ Multiple Sequence Alignment Completed
+                </h3>
 
-                        ${data.alignment_length}
+                <p>
+                    <strong>
+                        Number of sequences:
+                    </strong>
 
-                    </p>
+                    ${data.number_of_sequences}
+                </p>
+
+                <p>
+                    <strong>
+                        Alignment length:
+                    </strong>
+
+                    ${data.alignment_length}
+                </p>
+
+                <p>
+                    <strong>
+                        Execution time:
+                    </strong>
+
+                    ${data.execution_time}
+                    seconds
+                </p>
+
+            </div>
+        `;
 
 
-                    <p>
-
-                        <strong>
-                            Execution time:
-                        </strong>
-
-                        ${data.execution_time}
-                        seconds
-
-                    </p>
-
-                </div>
-
-            `;
-
-        }
+        document.getElementById(
+            "summarySequences"
+        ).textContent =
+            data.number_of_sequences;
 
 
-        // ----------------------------------------------------
-        // ENABLE NEIGHBOR JOINING BUTTON
-        // ----------------------------------------------------
+        document.getElementById(
+            "summaryAlignment"
+        ).textContent =
+            data.alignment_length +
+            " positions";
 
-        const njBtn =
+
+        const njButton =
             document.getElementById(
                 "njBtn"
             );
 
 
-        if (njBtn) {
+        if (data.number_of_sequences >= 3) {
 
-            njBtn.disabled =
-                false;
+            njButton.disabled = false;
 
         }
 
+
+        document.getElementById(
+            "alignment-section"
+        ).scrollIntoView({
+            behavior: "smooth"
+        });
+
+
     }
-
-
     catch (error) {
 
         console.error(
-            "REAL ALIGNMENT ERROR:",
+            "Alignment error:",
             error
         );
 
 
-        // ----------------------------------------------------
-        // SHOW ACTUAL ERROR
-        // ----------------------------------------------------
+        preview.innerHTML = `
+            <div class="error-box">
 
-        if (resultBox) {
+                <h3>
+                    Alignment Error
+                </h3>
 
-            resultBox.innerHTML = `
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
 
-                <div class="error-box">
-
-                    <h3>
-                        Alignment Error
-                    </h3>
-
-                    <p>
-                        ${escapeHTML(
-                            error.message
-                        )}
-                    </p>
-
-                </div>
-
-            `;
-
-        }
+            </div>
+        `;
 
 
-        if (previewBox) {
-
-            previewBox.innerHTML = `
-
-                <div class="error-box">
-
-                    <h3>
-                        Alignment Error
-                    </h3>
-
-                    <p>
-                        ${escapeHTML(
-                            error.message
-                        )}
-                    </p>
-
-                </div>
-
-            `;
-
-        }
+        resultBox.innerHTML = "";
 
     }
 
 
-    finally {
+    button.disabled = !validated;
 
-        if (alignBtn) {
-
-            alignBtn.disabled =
-                false;
-
-        }
-
-    }
 }
 
 
 // ============================================================
-// ESCAPE HTML
+// COLOUR-CODED ALIGNMENT
 // ============================================================
 
-function escapeHTML(text) {
+function renderAlignment(
+    rows
+) {
 
-    const div =
-        document.createElement(
-            "div"
+    const preview =
+        document.getElementById(
+            "alignmentPreview"
         );
 
 
-    div.textContent =
-        text;
+    if (
+        !rows ||
+        rows.length === 0
+    ) {
+
+        preview.innerHTML =
+            "<p>No alignment available.</p>";
+
+        return;
+
+    }
 
 
-    return div.innerHTML;
+    const alignmentLength =
+        rows[0].sequence.length;
+
+
+    // ========================================================
+    // CREATE CONSENSUS
+    // ========================================================
+
+    let consensus = "";
+
+
+    for (
+        let position = 0;
+        position < alignmentLength;
+        position++
+    ) {
+
+        const counts = {};
+
+
+        rows.forEach(
+            function(row) {
+
+                const character =
+                    (
+                        row.sequence[position] ||
+                        "-"
+                    ).toUpperCase();
+
+
+                if (
+                    character !== "-"
+                ) {
+
+                    counts[character] =
+                        (
+                            counts[character] ||
+                            0
+                        ) + 1;
+
+                }
+
+            }
+        );
+
+
+        const sorted =
+            Object.entries(
+                counts
+            ).sort(
+                function(a, b) {
+
+                    return b[1] - a[1];
+
+                }
+            );
+
+
+        if (sorted.length > 0) {
+
+            consensus +=
+                sorted[0][0];
+
+        }
+        else {
+
+            consensus += "-";
+
+        }
+
+    }
+
+
+    // ========================================================
+    // CONSENSUS ROW
+    // ========================================================
+
+    let consensusHTML = "";
+
+
+    for (
+        let i = 0;
+        i < consensus.length;
+        i++
+    ) {
+
+        const character =
+            consensus[i];
+
+
+        consensusHTML += `
+            <span class="consensus-char">
+                ${escapeHTML(character)}
+            </span>
+        `;
+
+    }
+
+
+    // ========================================================
+    // SEQUENCE ROWS
+    // ========================================================
+
+    let rowsHTML = "";
+
+
+    rows.forEach(
+        function(row) {
+
+            let sequenceHTML = "";
+
+
+            for (
+                let i = 0;
+                i < row.sequence.length;
+                i++
+            ) {
+
+                const character =
+                    row.sequence[i]
+                    .toUpperCase();
+
+
+                const isConserved =
+                    character !== "-" &&
+                    character === consensus[i];
+
+
+                const className =
+                    getBaseClass(
+                        character,
+                        isConserved
+                    );
+
+
+                sequenceHTML += `
+                    <span
+                        class="base ${className}"
+                        title="Position ${i + 1}"
+                    >
+                        ${escapeHTML(character)}
+                    </span>
+                `;
+
+            }
+
+
+            rowsHTML += `
+                <div class="alignment-row">
+
+                    <div
+                        class="sequence-name"
+                        title="${escapeHTML(row.name)}"
+                    >
+                        ${escapeHTML(row.name)}
+                    </div>
+
+                    <div class="sequence-track">
+                        ${sequenceHTML}
+                    </div>
+
+                </div>
+            `;
+
+        }
+    );
+
+
+    // ========================================================
+    // DISPLAY
+    // ========================================================
+
+    preview.innerHTML = `
+
+        <div class="alignment-container">
+
+            <div class="alignment-row consensus-row">
+
+                <div class="sequence-name">
+                    CONSENSUS
+                </div>
+
+                <div class="sequence-track">
+                    ${consensusHTML}
+                </div>
+
+            </div>
+
+            ${rowsHTML}
+
+        </div>
+
+    `;
+
+}
+
+
+// ============================================================
+// BASE COLOUR
+// ============================================================
+
+function getBaseClass(
+    character,
+    conserved
+) {
+
+    let className = "";
+
+
+    if (character === "A") {
+
+        className = "base-A";
+
+    }
+    else if (character === "T") {
+
+        className = "base-T";
+
+    }
+    else if (character === "G") {
+
+        className = "base-G";
+
+    }
+    else if (character === "C") {
+
+        className = "base-C";
+
+    }
+    else if (character === "U") {
+
+        className = "base-U";
+
+    }
+    else if (character === "-") {
+
+        className = "base-gap";
+
+    }
+    else {
+
+        className = "base-other";
+
+    }
+
+
+    if (conserved) {
+
+        className += " conserved";
+
+    }
+
+
+    return className;
+
 }
 
 
@@ -818,10 +893,8 @@ function escapeHTML(text) {
 
 async function buildNJTree() {
 
-    const fileInput =
-        document.getElementById(
-            "fastaFile"
-        );
+    const files =
+        getFiles();
 
 
     const resultBox =
@@ -830,78 +903,41 @@ async function buildNJTree() {
         );
 
 
-    const njBtn =
+    const button =
         document.getElementById(
             "njBtn"
         );
 
 
-    // --------------------------------------------------------
-    // CHECK FILE
-    // --------------------------------------------------------
-
-    if (
-        !fileInput ||
-        fileInput.files.length === 0
-    ) {
-
-        alert(
-            "Please select a FASTA file first."
-        );
-
-        return;
-    }
-
-
-    // --------------------------------------------------------
-    // DISABLE NJ BUTTON
-    // --------------------------------------------------------
-
-    if (njBtn) {
-
-        njBtn.disabled =
-            true;
-
-    }
-
-
-    // --------------------------------------------------------
-    // SHOW LOADING
-    // --------------------------------------------------------
-
-    if (resultBox) {
+    if (files.length === 0) {
 
         resultBox.innerHTML = `
-
-            <div class="loading">
+            <div class="error-box">
 
                 <h3>
-                    Building Neighbor Joining Tree...
+                    Tree Construction Failed
                 </h3>
 
                 <p>
-                    Please wait.
+                    Please upload FASTA files first.
                 </p>
 
             </div>
-
         `;
+
+        return;
 
     }
 
 
-    // --------------------------------------------------------
-    // CREATE FORM DATA
-    // --------------------------------------------------------
-
-    const formData =
-        new FormData();
+    button.disabled = true;
 
 
-    formData.append(
-        "file",
-        fileInput.files[0]
-    );
+    resultBox.innerHTML = `
+        <div class="loading">
+            Building Neighbor Joining Tree...
+        </div>
+    `;
 
 
     try {
@@ -910,194 +946,142 @@ async function buildNJTree() {
             await fetch(
                 "/build-tree",
                 {
-
                     method: "POST",
-
-                    body: formData
-
+                    body: createFormData()
                 }
             );
 
 
-        const responseText =
-            await response.text();
+        const data =
+            await response.json();
 
 
-        console.log(
-            "NJ server response:",
-            responseText
-        );
+        if (
+            !response.ok ||
+            !data.success
+        ) {
 
-
-        let data;
-
-
-        try {
-
-            data =
-                JSON.parse(
-                    responseText
+            const message =
+                data.message ||
+                (
+                    data.errors
+                        ? data.errors.join("<br>")
+                        : "Tree construction failed."
                 );
 
-        }
-
-        catch (error) {
 
             throw new Error(
-                "Invalid response from Flask."
+                message
             );
 
         }
 
 
-        // ----------------------------------------------------
-        // TREE FAILED
-        // ----------------------------------------------------
+        resultBox.innerHTML = `
 
-        if (!data.success) {
+            <div class="result-card">
 
-            const message =
-                data.message ||
-                data.error ||
-                "Tree construction failed.";
+                <h3>
+                    ✓ Neighbor Joining Tree Generated
+                </h3>
 
+                <p>
+                    <strong>
+                        Method:
+                    </strong>
 
-            if (resultBox) {
+                    ${data.method}
+                </p>
 
-                resultBox.innerHTML = `
+                <p>
+                    <strong>
+                        Sequences:
+                    </strong>
 
-                    <div class="error-box">
+                    ${data.number_of_sequences}
+                </p>
 
-                        <h3>
-                            Tree Construction Failed
-                        </h3>
+                <p>
+                    <strong>
+                        Execution time:
+                    </strong>
 
-                        <p>
-                            ${escapeHTML(message)}
-                        </p>
+                    ${data.execution_time}
+                    seconds
+                </p>
 
-                    </div>
+                <h4>
+                    Newick Representation
+                </h4>
 
-                `;
+                <pre class="newick-box">
+${escapeHTML(data.newick)}
+                </pre>
 
-            }
+            </div>
 
-
-            return;
-        }
-
-
-        // ----------------------------------------------------
-        // SHOW NJ RESULT
-        // ----------------------------------------------------
-
-        if (resultBox) {
-
-            resultBox.innerHTML = `
-
-                <div class="result-card">
-
-                    <h3>
-                        ✓ Neighbor Joining Tree Generated
-                    </h3>
+        `;
 
 
-                    <p>
+        document.getElementById(
+            "summaryTree"
+        ).textContent =
+            "NJ Ready";
 
-                        <strong>
-                            Method:
-                        </strong>
-
-                        ${escapeHTML(
-                            data.method ||
-                            "Neighbor Joining"
-                        )}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Number of sequences:
-                        </strong>
-
-                        ${data.number_of_sequences}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Execution time:
-                        </strong>
-
-                        ${data.execution_time}
-                        seconds
-
-                    </p>
-
-
-                    <h4>
-                        Newick Representation
-                    </h4>
-
-
-                    <pre class="newick-box">${escapeHTML(
-                        data.newick || ""
-                    )}</pre>
-
-                </div>
-
-            `;
-
-        }
 
     }
-
-
     catch (error) {
 
         console.error(
-            "NJ error:",
+            "Tree error:",
             error
         );
 
 
-        if (resultBox) {
+        resultBox.innerHTML = `
+            <div class="error-box">
 
-            resultBox.innerHTML = `
+                <h3>
+                    Tree Construction Error
+                </h3>
 
-                <div class="error-box">
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
 
-                    <h3>
-                        Neighbor Joining Error
-                    </h3>
-
-                    <p>
-                        ${escapeHTML(
-                            error.message
-                        )}
-                    </p>
-
-                </div>
-
-            `;
-
-        }
+            </div>
+        `;
 
     }
 
 
-    finally {
+    button.disabled = false;
 
-        if (njBtn) {
+}
 
-            njBtn.disabled =
-                false;
 
-        }
+// ============================================================
+// ESCAPE HTML
+// ============================================================
 
-    }
+function escapeHTML(
+    value
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        String(
+            value ?? ""
+        );
+
+
+    return div.innerHTML;
+
 }

@@ -1,29 +1,37 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>PhyloBuilder | Bioinformatics</title>
+    <title>
+        PhyloBuilder | Bioinformatics
+    </title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 
 </head>
 
 
 <body>
 
+
 <div class="app-container">
 
 
-    <!-- ==================================================
-         SIDEBAR
-         ================================================== -->
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
 
     <aside class="sidebar">
 
@@ -34,8 +42,15 @@
             </div>
 
             <div>
-                <h2>PhyloBuilder</h2>
-                <span>Bioinformatics</span>
+
+                <h2>
+                    PhyloBuilder
+                </h2>
+
+                <span>
+                    Bioinformatics
+                </span>
+
             </div>
 
         </div>
@@ -43,52 +58,28 @@
 
         <nav>
 
-            <a href="#home-section"
-               class="nav-link active">
-                <span>⌂</span>
-                Home
+            <a href="#home-section">
+                🏠 Home
             </a>
 
-            <a href="#upload-section"
-               class="nav-link">
-                <span>↑</span>
-                Upload
+            <a href="#upload-section">
+                ↑ Upload
             </a>
 
-            <a href="#alignment-section"
-               class="nav-link">
-                <span>≋</span>
-                Alignment
+            <a href="#alignment-section">
+                ≋ Alignment
             </a>
 
-            <a href="#tree-section"
-               class="nav-link">
-                <span>♧</span>
-                Tree Builder
+            <a href="#tree-section">
+                🌿 Tree Builder
             </a>
 
-            <a href="#bootstrap-section"
-               class="nav-link">
-                <span>◈</span>
-                Bootstrap
+            <a href="#bootstrap-section">
+                ◈ Bootstrap
             </a>
 
-            <a href="#visualization-section"
-               class="nav-link">
-                <span>⌕</span>
-                Visualization
-            </a>
-
-            <a href="#results-section"
-               class="nav-link">
-                <span>▥</span>
-                Results
-            </a>
-
-            <a href="#export-section"
-               class="nav-link">
-                <span>↓</span>
-                Export
+            <a href="#visualization-section">
+                🔍 Visualization
             </a>
 
         </nav>
@@ -106,96 +97,63 @@
 
 
 
-    <!-- ==================================================
-         MAIN CONTENT
-         ================================================== -->
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
 
     <main class="main-content">
 
 
-        <!-- ==================================================
-             HOME
-             ================================================== -->
+        <!-- HOME -->
 
-        <section id="home-section"
-                 class="hero-section">
+        <section
+            id="home-section"
+            class="hero-section"
+        >
 
             <div class="hero-badge">
-                🧬 BIOINFORMATICS CAPSTONE
+                🧬 BIOINFORMATICS PROJECT
             </div>
-
 
             <h1>
                 Hybrid Phylogenetic
-                <span>Tree Builder</span>
+                <span>
+                    Tree Builder
+                </span>
             </h1>
 
+            <p>
 
-            <p class="hero-description">
-
-                Build phylogenetic trees from DNA, RNA,
-                or protein sequences using a hybrid
-                computational workflow with fast bootstrap
-                confidence estimation.
+                Build phylogenetic trees from
+                DNA, RNA or protein sequences
+                using sequence alignment,
+                fast confidence estimation
+                and interactive visualization.
 
             </p>
 
 
-            <div class="hero-actions">
+            <button
+                class="primary-button"
+                onclick="scrollToUpload()"
+            >
 
-                <button
-                    class="primary-button"
-                    onclick="scrollToUpload()">
+                Start Analysis →
 
-                    Start Analysis
-                    <span>→</span>
-
-                </button>
-
-            </div>
-
-
-            <div class="hero-workflow">
-
-                <div class="workflow-item">
-                    <span>01</span>
-                    FASTA
-                </div>
-
-                <div class="workflow-line"></div>
-
-                <div class="workflow-item">
-                    <span>02</span>
-                    Alignment
-                </div>
-
-                <div class="workflow-line"></div>
-
-                <div class="workflow-item">
-                    <span>03</span>
-                    Tree
-                </div>
-
-                <div class="workflow-line"></div>
-
-                <div class="workflow-item">
-                    <span>04</span>
-                    Bootstrap
-                </div>
-
-            </div>
+            </button>
 
         </section>
 
 
 
-        <!-- ==================================================
-             UPLOAD
-             ================================================== -->
+        <!-- ================================================= -->
+        <!-- UPLOAD -->
+        <!-- ================================================= -->
 
-        <section id="upload-section"
-                 class="content-section">
-
+        <section
+            id="upload-section"
+            class="content-section"
+        >
 
             <div class="section-heading">
 
@@ -206,11 +164,11 @@
                 <div>
 
                     <h2>
-                        Sequence Input
+                        Sequence Processing
                     </h2>
 
                     <p>
-                        Upload and validate your biological sequences.
+                        Upload one or more FASTA files.
                     </p>
 
                 </div>
@@ -232,14 +190,18 @@
 
 
                 <p>
-                    DNA, RNA or protein sequences
+                    You can select multiple
+                    FASTA files.
                 </p>
 
+
+                <!-- IMPORTANT: multiple -->
 
                 <input
                     type="file"
                     id="fastaFile"
                     accept=".fasta,.fa,.fas"
+                    multiple
                     hidden
                     onchange="showFileName()"
                 >
@@ -247,18 +209,30 @@
 
                 <button
                     class="secondary-button"
-                    onclick="document.getElementById('fastaFile').click()">
+                    onclick="
+                        document
+                        .getElementById('fastaFile')
+                        .click()
+                    "
+                >
 
-                    Choose FASTA File
+                    Choose FASTA Files
 
                 </button>
 
 
-                <div id="fileName"
-                     class="file-name">
+                <div
+                    id="fileName"
+                    class="file-name"
+                >
+                    No files selected
+                </div>
 
-                    No file selected
 
+                <div
+                    id="selectedFiles"
+                    class="selected-files"
+                >
                 </div>
 
 
@@ -266,8 +240,10 @@
 
 
                     <button
+                        id="validateBtn"
                         class="primary-button"
-                        onclick="validateFile()">
+                        onclick="validateFiles()"
+                    >
 
                         ✓ Validate Sequences
 
@@ -278,36 +254,46 @@
                         id="alignBtn"
                         class="primary-button"
                         onclick="runAlignment()"
-                        disabled>
+                        disabled
+                    >
 
                         Run Alignment
 
                     </button>
 
+
                 </div>
 
 
-                <div id="validationStatus"></div>
+                <div
+                    id="validationStatus"
+                >
+                </div>
 
 
-                <div id="alignmentResult"></div>
+                <div
+                    id="alignmentResult"
+                >
+                </div>
+
 
             </div>
 
 
-            <!-- SEQUENCE STATISTICS -->
+
+            <!-- STATISTICS -->
 
             <div class="stats-grid">
 
 
                 <div class="stat-card">
 
-                    <span class="stat-label">
+                    <span>
                         SEQUENCES
                     </span>
 
                     <strong id="sequenceCount">
-                        —
+                        0
                     </strong>
 
                 </div>
@@ -315,7 +301,7 @@
 
                 <div class="stat-card">
 
-                    <span class="stat-label">
+                    <span>
                         TYPE
                     </span>
 
@@ -328,12 +314,12 @@
 
                 <div class="stat-card">
 
-                    <span class="stat-label">
+                    <span>
                         TOTAL LENGTH
                     </span>
 
                     <strong id="totalLength">
-                        —
+                        0
                     </strong>
 
                 </div>
@@ -341,29 +327,32 @@
 
                 <div class="stat-card">
 
-                    <span class="stat-label">
-                        STATUS
+                    <span>
+                        FILES
                     </span>
 
-                    <strong class="ready-text">
-                        Ready
+                    <strong id="fileCount">
+                        0
                     </strong>
 
                 </div>
 
+
             </div>
+
 
         </section>
 
 
 
-        <!-- ==================================================
-             ALIGNMENT
-             ================================================== -->
+        <!-- ================================================= -->
+        <!-- ALIGNMENT -->
+        <!-- ================================================= -->
 
-        <section id="alignment-section"
-                 class="content-section">
-
+        <section
+            id="alignment-section"
+            class="content-section"
+        >
 
             <div class="section-heading">
 
@@ -378,7 +367,9 @@
                     </h2>
 
                     <p>
-                        Prepare aligned sequences for phylogenetic analysis.
+                        Colour-coded alignment
+                        showing conserved and
+                        variable positions.
                     </p>
 
                 </div>
@@ -397,41 +388,85 @@
                             Alignment Preview
                         </h3>
 
-                        <p>
-                            The processed alignment will appear here.
+                        <p id="alignmentMeta">
+                            Run alignment to display
+                            the result.
                         </p>
 
                     </div>
 
-                    <span class="processing-badge">
+                    <span>
                         PHASE 2
                     </span>
 
                 </div>
 
 
-                <div id="alignmentPreview"
-                     class="alignment-preview">
+                <div
+                    id="alignmentPreview"
+                    class="alignment-preview"
+                >
+
+                    <p>
+                        Run alignment to display
+                        the colour-coded alignment.
+                    </p>
+
+                </div>
+
+
+                <!-- LEGEND -->
+
+                <div class="alignment-legend">
 
                     <span>
-                        Run alignment to display the result.
+                        <b class="base-A">A</b>
+                        Adenine
+                    </span>
+
+                    <span>
+                        <b class="base-T">T</b>
+                        Thymine
+                    </span>
+
+                    <span>
+                        <b class="base-G">G</b>
+                        Guanine
+                    </span>
+
+                    <span>
+                        <b class="base-C">C</b>
+                        Cytosine
+                    </span>
+
+                    <span>
+                        <b class="base-U">U</b>
+                        Uracil
+                    </span>
+
+                    <span>
+                        <b class="base-gap">−</b>
+                        Gap
                     </span>
 
                 </div>
 
+
             </div>
+
 
         </section>
 
 
 
-        <!-- ==================================================
-             TREE BUILDER
-             ================================================== -->
+        <!-- ================================================= -->
+        <!-- NJ TREE -->
+        <!-- ================================================= -->
 
-        <section id="tree-section"
-                 class="content-section">
-
+        <section
+            id="tree-section"
+            class="content-section"
+        >
 
             <div class="section-heading">
 
@@ -442,12 +477,12 @@
                 <div>
 
                     <h2>
-                        Hybrid Tree Construction
+                        Phylogenetic Tree
                     </h2>
 
                     <p>
-                        Generate an initial tree using Neighbor Joining,
-                        followed by Maximum Likelihood refinement.
+                        Generate an initial
+                        Neighbor Joining tree.
                     </p>
 
                 </div>
@@ -455,136 +490,54 @@
             </div>
 
 
-            <div class="method-grid">
+            <div class="method-card">
 
 
-                <!-- NJ -->
-
-                <div class="method-card active-method">
-
-                    <div class="method-number">
-                        01
-                    </div>
+                <h3>
+                    🌿 Neighbor Joining
+                </h3>
 
 
-                    <div class="method-icon">
-                        🌿
-                    </div>
+                <p>
+
+                    Distance-based phylogenetic
+                    tree construction from
+                    aligned sequences.
+
+                </p>
 
 
-                    <h3>
-                        Neighbor Joining
-                    </h3>
+                <button
+                    id="njBtn"
+                    class="primary-button"
+                    onclick="buildNJTree()"
+                    disabled
+                >
+
+                    Build NJ Tree
+
+                </button>
 
 
-                    <p>
-                        Fast distance-based method used
-                        to construct the initial phylogenetic tree.
-                    </p>
-
-
-                    <span class="method-status">
-                        AVAILABLE
-                    </span>
-
-
-                    <button
-                        id="njBtn"
-                        class="primary-button full-button"
-                        onclick="buildNJTree()"
-                        disabled>
-
-                        Build NJ Tree
-
-                    </button>
-
-
-                    <div id="njResult"></div>
-
+                <div id="njResult">
                 </div>
 
 
-
-                <!-- ML -->
-
-                <div class="method-card disabled-method">
-
-                    <div class="method-number">
-                        02
-                    </div>
-
-
-                    <div class="method-icon">
-                        🧠
-                    </div>
-
-
-                    <h3>
-                        Maximum Likelihood
-                    </h3>
-
-
-                    <p>
-                        Refines and evaluates the initial
-                        tree using a likelihood-based approach.
-                    </p>
-
-
-                    <span class="method-status">
-                        NEXT PHASE
-                    </span>
-
-
-                    <button
-                        class="secondary-button full-button"
-                        disabled>
-
-                        ML Refinement
-
-                    </button>
-
-                </div>
-
             </div>
 
-
-            <div class="hybrid-flow">
-
-                <span>
-                    Alignment
-                </span>
-
-                <b>→</b>
-
-                <span>
-                    Neighbor Joining
-                </span>
-
-                <b>→</b>
-
-                <span class="highlight-flow">
-                    Maximum Likelihood
-                </span>
-
-                <b>→</b>
-
-                <span>
-                    Final Tree
-                </span>
-
-            </div>
 
         </section>
 
 
 
-        <!-- ==================================================
-             BOOTSTRAP
-             ================================================== -->
+        <!-- ================================================= -->
+        <!-- BOOTSTRAP -->
+        <!-- ================================================= -->
 
-        <section id="bootstrap-section"
-                 class="content-section">
-
+        <section
+            id="bootstrap-section"
+            class="content-section"
+        >
 
             <div class="section-heading">
 
@@ -599,7 +552,9 @@
                     </h2>
 
                     <p>
-                        Estimate confidence values for tree branches.
+                        Estimate branch confidence
+                        and identify unreliable
+                        regions.
                     </p>
 
                 </div>
@@ -609,25 +564,14 @@
 
             <div class="coming-card">
 
-                <div class="coming-icon">
-                    ◈
-                </div>
-
-
                 <h3>
-                    Bootstrap Analysis
+                    ◈ Fast Bootstrap
                 </h3>
 
-
                 <p>
-                    Fast bootstrap estimation will be connected
-                    after the hybrid tree construction is complete.
+                    Bootstrap confidence module
+                    will be connected here.
                 </p>
-
-
-                <span>
-                    COMING NEXT
-                </span>
 
             </div>
 
@@ -635,13 +579,14 @@
 
 
 
-        <!-- ==================================================
-             VISUALIZATION
-             ================================================== -->
+        <!-- ================================================= -->
+        <!-- VISUALIZATION -->
+        <!-- ================================================= -->
 
-        <section id="visualization-section"
-                 class="content-section">
-
+        <section
+            id="visualization-section"
+            class="content-section"
+        >
 
             <div class="section-heading">
 
@@ -652,11 +597,12 @@
                 <div>
 
                     <h2>
-                        Interactive Tree Visualization
+                        Interactive Visualization
                     </h2>
 
                     <p>
-                        Explore the final phylogenetic tree interactively.
+                        Interactive tree visualization
+                        and confidence highlighting.
                     </p>
 
                 </div>
@@ -664,28 +610,17 @@
             </div>
 
 
-            <div class="tree-placeholder">
-
-
-                <div class="tree-placeholder-icon">
-                    🌳
-                </div>
-
+            <div class="coming-card">
 
                 <h3>
-                    Interactive Tree
+                    🌳 Interactive Tree
                 </h3>
 
-
                 <p>
-                    Zoom, pan, search taxa, highlight clades
-                    and display bootstrap confidence values.
+                    Interactive visualization
+                    will be connected to the
+                    final tree.
                 </p>
-
-
-                <span>
-                    COMING AFTER TREE CONSTRUCTION
-                </span>
 
             </div>
 
@@ -693,13 +628,13 @@
 
 
 
-        <!-- ==================================================
-             RESULTS
-             ================================================== -->
+        <!-- ================================================= -->
+        <!-- SUMMARY -->
+        <!-- ================================================= -->
 
-        <section id="results-section"
-                 class="content-section">
-
+        <section
+            class="content-section"
+        >
 
             <div class="section-heading">
 
@@ -710,174 +645,73 @@
                 <div>
 
                     <h2>
-                        Results Dashboard
+                        Results
                     </h2>
 
-                    <p>
-                        Summary of the complete phylogenetic analysis.
-                    </p>
-
                 </div>
 
             </div>
 
 
-            <div class="results-grid">
+            <div class="stats-grid">
 
 
-                <div class="result-stat">
-                    <span>Sequences</span>
-                    <strong>—</strong>
+                <div class="stat-card">
+
+                    <span>
+                        SEQUENCES
+                    </span>
+
+                    <strong id="summarySequences">
+                        —
+                    </strong>
+
                 </div>
 
 
-                <div class="result-stat">
-                    <span>Alignment</span>
-                    <strong>—</strong>
+                <div class="stat-card">
+
+                    <span>
+                        ALIGNMENT
+                    </span>
+
+                    <strong id="summaryAlignment">
+                        —
+                    </strong>
+
                 </div>
 
 
-                <div class="result-stat">
-                    <span>Bootstrap</span>
-                    <strong>—</strong>
+                <div class="stat-card">
+
+                    <span>
+                        BOOTSTRAP
+                    </span>
+
+                    <strong>
+                        Next
+                    </strong>
+
                 </div>
 
 
-                <div class="result-stat">
-                    <span>Total Time</span>
-                    <strong>—</strong>
+                <div class="stat-card">
+
+                    <span>
+                        TREE
+                    </span>
+
+                    <strong id="summaryTree">
+                        —
+                    </strong>
+
                 </div>
+
 
             </div>
 
-
-            <div class="analysis-summary">
-
-                <h3>
-                    Analysis Summary
-                </h3>
-
-
-                <p>
-                    Complete analysis information will appear
-                    here after all computational modules are completed.
-                </p>
-
-            </div>
 
         </section>
-
-
-
-        <!-- ==================================================
-             EXPORT
-             ================================================== -->
-
-        <section id="export-section"
-                 class="content-section">
-
-
-            <div class="section-heading">
-
-                <div class="section-number">
-                    07
-                </div>
-
-                <div>
-
-                    <h2>
-                        Export Results
-                    </h2>
-
-                    <p>
-                        Download your final analysis results.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="export-grid">
-
-
-                <button class="export-card"
-                        disabled>
-
-                    <strong>
-                        Newick
-                    </strong>
-
-                    <span>
-                        .nwk
-                    </span>
-
-                </button>
-
-
-                <button class="export-card"
-                        disabled>
-
-                    <strong>
-                        Tree Image
-                    </strong>
-
-                    <span>
-                        PNG / SVG
-                    </span>
-
-                </button>
-
-
-                <button class="export-card"
-                        disabled>
-
-                    <strong>
-                        Bootstrap
-                    </strong>
-
-                    <span>
-                        CSV
-                    </span>
-
-                </button>
-
-
-                <button class="export-card"
-                        disabled>
-
-                    <strong>
-                        Report
-                    </strong>
-
-                    <span>
-                        PDF
-                    </span>
-
-                </button>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- ==================================================
-             FOOTER
-             ================================================== -->
-
-        <footer>
-
-            <strong>
-                PhyloBuilder
-            </strong>
-
-            <span>
-                Hybrid Phylogenetic Tree Builder
-                · Bioinformatics Capstone
-            </span>
-
-        </footer>
 
 
     </main>
@@ -885,7 +719,9 @@
 </div>
 
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
 
 
 </body>

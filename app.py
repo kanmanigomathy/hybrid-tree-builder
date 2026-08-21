@@ -4,116 +4,210 @@ from Bio.Align import PairwiseAligner, MultipleSeqAlignment
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-
 from io import StringIO
 import statistics
 import time
 
-
 app = Flask(__name__)
 
 
-# =========================================================
-# SEQUENCE TYPE DETECTION
-# =========================================================
+# ============================================================
+# SEQUENCE TYPE
+# ============================================================
 
 def detect_sequence_type(sequence):
 
-    sequence = sequence.upper()
+    sequence = sequence.upper().replace("-", "")
+    chars = set(sequence)
 
     dna_chars = set("ACGTN")
     rna_chars = set("ACGUN")
 
-    sequence_chars = set(sequence)
-
-    if sequence_chars.issubset(dna_chars):
+    if chars and chars.issubset(dna_chars):
         return "DNA"
 
-    if sequence_chars.issubset(rna_chars):
+    if chars and chars.issubset(rna_chars):
         return "RNA"
 
     return "Protein"
 
 
-# =========================================================
-# FASTA VALIDATION
-# =========================================================
+# ============================================================
+# GET UPLOADED FILES
+# ============================================================
 
-def validate_fasta(text):
+def get_uploaded_files():
+
+    files = request.files.getlist("files")
+
+    # Compatibility with old single-file upload
+    if not files:
+        files = request.files.getlist("file")
+
+    return [
+        f for f in files
+        if f and f.filename
+    ]
+
+
+# ============================================================
+# PARSE MULTIPLE FASTA FILES
+# ============================================================
+
+def parse_fasta_files(files):
 
     sequences = []
     errors = []
 
-    try:
+    if not files:
+        return [], ["Please upload at least one FASTA file."]
 
-        records = list(
-            SeqIO.parse(
-                StringIO(text),
-                "fasta"
-            )
-        )
+    for file in files:
 
-        if len(records) == 0:
+        filename = file.filename
 
+        if not filename.lower().endswith(
+            (".fasta", ".fa", ".fas")
+        ):
             errors.append(
-                "No FASTA sequences found."
+                f"{filename}: unsupported file type."
+            )
+            continue
+
+        try:
+
+            raw = file.read()
+
+            text = raw.decode("utf-8-sig")
+
+            records = list(
+                SeqIO.parse(
+                    StringIO(text),
+                    "fasta"
+                )
             )
 
-            return sequences, errors
-
-
-        for record in records:
-
-            sequence = str(
-                record.seq
-            ).upper()
-
-
-            if len(sequence) == 0:
+            if not records:
 
                 errors.append(
-                    f"{record.id}: Empty sequence."
+                    f"{filename}: no FASTA sequences found."
                 )
 
                 continue
 
+            for record in records:
 
-            sequence_type = detect_sequence_type(
-                sequence
+                sequence = (
+                    str(record.seq)
+                    .upper()
+                    .replace(" ", "")
+                    .replace("\r", "")
+                    .replace("\n", "")
+                )
+
+                if not sequence:
+
+                    errors.append(
+                        f"{filename} / {record.id}: empty sequence."
+                    )
+
+                    continue
+
+                sequences.append({
+
+                    "name": record.id,
+
+                    "length": len(sequence),
+
+                    "sequence": sequence,
+
+                    "type": detect_sequence_type(
+                        sequence
+                    ),
+
+                    "source_file": filename
+
+                })
+
+        except UnicodeDecodeError:
+
+            errors.append(
+                f"{filename}: invalid encoding. "
+                f"Save the FASTA file as UTF-8."
             )
 
+        except Exception as e:
 
-            sequence_data = {
-
-                "name": record.id,
-
-                "length": len(sequence),
-
-                "sequence": sequence,
-
-                "type": sequence_type
-            }
-
-
-            sequences.append(
-                sequence_data
+            errors.append(
+                f"{filename}: invalid FASTA format: {e}"
             )
-
-
-    except Exception as error:
-
-        errors.append(
-            "Invalid FASTA format: "
-            + str(error)
-        )
-
 
     return sequences, errors
 
 
-# =========================================================
-# HOME PAGE
-# =========================================================
+# ============================================================
+# VALIDATION STATISTICS
+# ============================================================
+
+def validation_statistics(sequences):
+
+    lengths = [
+        s["length"]
+        for s in sequences
+    ]
+
+    types = [
+        s["type"]
+        for s in sequences
+    ]
+
+    if types and all(
+        t == types[0]
+        for t in types
+    ):
+        overall_type = types[0]
+    else:
+        overall_type = "Mixed"
+
+    return {
+
+        "number_of_sequences":
+            len(sequences),
+
+        "sequence_type":
+            overall_type,
+
+        "minimum_length":
+            min(lengths)
+            if lengths else 0,
+
+        "maximum_length":
+            max(lengths)
+            if lengths else 0,
+
+        "average_length":
+            round(
+                statistics.mean(lengths),
+                2
+            )
+            if lengths else 0,
+
+        "total_length":
+            sum(lengths),
+
+        "number_of_files":
+            len(
+                set(
+                    s["source_file"]
+                    for s in sequences
+                )
+            )
+    }
+
+
+# ============================================================
+# HOME
+# ============================================================
 
 @app.route("/")
 def home():
@@ -123,9 +217,9 @@ def home():
     )
 
 
-# =========================================================
-# FASTA VALIDATION API
-# =========================================================
+# ============================================================
+# VALIDATE
+# ============================================================
 
 @app.route(
     "/validate",
@@ -133,123 +227,33 @@ def home():
 )
 def validate():
 
-    if "file" not in request.files:
+    files = get_uploaded_files()
+
+    if not files:
 
         return jsonify({
 
             "success": False,
 
             "message":
-                "Please upload a FASTA file."
-        })
+                "Please upload at least one FASTA file."
 
+        }), 400
 
-    file = request.files["file"]
-
-
-    if file.filename == "":
-
-        return jsonify({
-
-            "success": False,
-
-            "message":
-                "No file selected."
-        })
-
-
-    try:
-
-        text = file.read().decode(
-            "utf-8"
-        )
-
-    except UnicodeDecodeError:
-
-        return jsonify({
-
-            "success": False,
-
-            "message":
-                "Invalid text encoding."
-        })
-
-
-    sequences, errors = validate_fasta(
-        text
+    sequences, errors = parse_fasta_files(
+        files
     )
 
-
-    if len(errors) > 0:
-
-        return jsonify({
-
-            "success": False,
-
-            "errors": errors
-        })
-
-
-    if len(sequences) == 0:
+    if not sequences:
 
         return jsonify({
 
             "success": False,
 
-            "message":
-                "No valid sequences found."
-        })
+            "errors":
+                errors
 
-
-    lengths = [
-
-        item["length"]
-
-        for item in sequences
-    ]
-
-
-    sequence_types = [
-
-        item["type"]
-
-        for item in sequences
-    ]
-
-
-    if all(
-        item == sequence_types[0]
-        for item in sequence_types
-    ):
-
-        overall_type = sequence_types[0]
-
-    else:
-
-        overall_type = "Mixed"
-
-
-    statistics_data = {
-
-        "number_of_sequences":
-            len(sequences),
-
-        "sequence_type":
-            overall_type,
-
-        "minimum_length":
-            min(lengths),
-
-        "maximum_length":
-            max(lengths),
-
-        "average_length":
-            round(
-                statistics.mean(lengths),
-                2
-            )
-    }
-
+        }), 400
 
     return jsonify({
 
@@ -259,29 +263,27 @@ def validate():
             "FASTA validation successful.",
 
         "statistics":
-            statistics_data,
+            validation_statistics(
+                sequences
+            ),
 
         "sequences":
-            sequences
+            sequences,
+
+        "warnings":
+            errors
+
     })
 
 
-# =========================================================
-# MULTIPLE SEQUENCE ALIGNMENT
-# =========================================================
+# ============================================================
+# PAIRWISE ALIGNMENT
+# ============================================================
 
-def create_alignment(sequences):
-
-    if len(sequences) < 2:
-
-        return (
-            None,
-            "At least two sequences are required."
-        )
-
-
-    reference = sequences[0]["sequence"]
-
+def pairwise_to_gapped(
+    reference,
+    sequence
+):
 
     aligner = PairwiseAligner()
 
@@ -293,225 +295,283 @@ def create_alignment(sequences):
 
     aligner.extend_gap_score = -0.5
 
+    alignment = aligner.align(
+        reference,
+        sequence
+    )[0]
 
-    aligned_sequences = []
+    ref_output = []
+
+    seq_output = []
+
+    coordinates = alignment.coordinates
+
+    for i in range(
+        coordinates.shape[1] - 1
+    ):
+
+        r0 = int(
+            coordinates[0, i]
+        )
+
+        r1 = int(
+            coordinates[0, i + 1]
+        )
+
+        s0 = int(
+            coordinates[1, i]
+        )
+
+        s1 = int(
+            coordinates[1, i + 1]
+        )
+
+        dr = r1 - r0
+        ds = s1 - s0
+
+        if dr and ds:
+
+            ref_output.append(
+                reference[r0:r1]
+            )
+
+            seq_output.append(
+                sequence[s0:s1]
+            )
+
+        elif dr and not ds:
+
+            ref_output.append(
+                reference[r0:r1]
+            )
+
+            seq_output.append(
+                "-" * dr
+            )
+
+        elif ds and not dr:
+
+            ref_output.append(
+                "-" * ds
+            )
+
+            seq_output.append(
+                sequence[s0:s1]
+            )
+
+    return (
+        "".join(ref_output),
+        "".join(seq_output)
+    )
 
 
-    aligned_sequences.append({
+# ============================================================
+# PROGRESSIVE ALIGNMENT
+# ============================================================
+
+def merge_alignment(
+    rows,
+    new_reference,
+    new_sequence
+):
+
+    old_reference = rows[0]["sequence"]
+
+    if old_reference == new_reference:
+
+        return rows + [{
+
+            "name": "",
+            "sequence": new_sequence
+
+        }]
+
+    merged = [
+
+        {
+            "name": row["name"],
+            "sequence": ""
+        }
+
+        for row in rows
+
+    ]
+
+    new_row = ""
+
+    i = 0
+    j = 0
+
+    while (
+        i < len(old_reference)
+        or
+        j < len(new_reference)
+    ):
+
+        old_char = (
+            old_reference[i]
+            if i < len(old_reference)
+            else None
+        )
+
+        new_char = (
+            new_reference[j]
+            if j < len(new_reference)
+            else None
+        )
+
+        if (
+            old_char == new_char
+        ):
+
+            for k, row in enumerate(rows):
+
+                merged[k]["sequence"] += (
+                    row["sequence"][i]
+                )
+
+            new_row += new_sequence[j]
+
+            i += 1
+            j += 1
+
+        elif (
+            old_char == "-"
+            and
+            new_char != "-"
+        ):
+
+            for k, row in enumerate(rows):
+
+                merged[k]["sequence"] += (
+                    row["sequence"][i]
+                )
+
+            new_row += "-"
+
+            i += 1
+
+        elif (
+            new_char == "-"
+            and
+            old_char != "-"
+        ):
+
+            for k in range(len(rows)):
+
+                merged[k]["sequence"] += "-"
+
+            new_row += new_sequence[j]
+
+            j += 1
+
+        else:
+
+            if old_char is not None:
+
+                for k, row in enumerate(rows):
+
+                    merged[k]["sequence"] += (
+                        row["sequence"][i]
+                    )
+
+                new_row += "-"
+
+                i += 1
+
+            if new_char is not None:
+
+                for k in range(len(rows)):
+
+                    merged[k]["sequence"] += "-"
+
+                new_row += new_sequence[j]
+
+                j += 1
+
+    merged.append({
+
+        "name": "",
+
+        "sequence": new_row
+
+    })
+
+    return merged
+
+
+# ============================================================
+# CREATE MULTIPLE SEQUENCE ALIGNMENT
+# ============================================================
+
+def create_alignment(sequences):
+
+    if len(sequences) < 2:
+
+        return (
+            None,
+            "At least two sequences are required."
+        )
+
+    rows = [{
 
         "name":
             sequences[0]["name"],
 
         "sequence":
-            reference
-    })
+            sequences[0]["sequence"]
 
+    }]
 
     for item in sequences[1:]:
 
-        sequence = item["sequence"]
-
-
-        alignment = aligner.align(
-            reference,
-            sequence
-        )[0]
-
-
-        aligned_reference = []
-
-        aligned_sequence = []
-
-
-        ref_blocks = alignment.aligned[0]
-
-        seq_blocks = alignment.aligned[1]
-
-
-        ref_position = 0
-
-        seq_position = 0
-
-
-        for i in range(
-            len(ref_blocks)
-        ):
-
-            ref_start = ref_blocks[i][0]
-
-            ref_end = ref_blocks[i][1]
-
-            seq_start = seq_blocks[i][0]
-
-            seq_end = seq_blocks[i][1]
-
-
-            # Reference gap
-
-            if ref_start > ref_position:
-
-                gap_length = (
-                    ref_start -
-                    ref_position
-                )
-
-
-                aligned_reference.extend(
-
-                    reference[
-                        ref_position:
-                        ref_start
-                    ]
-                )
-
-
-                aligned_sequence.extend(
-
-                    "-" * gap_length
-                )
-
-
-            # Sequence gap
-
-            if seq_start > seq_position:
-
-                gap_length = (
-                    seq_start -
-                    seq_position
-                )
-
-
-                aligned_reference.extend(
-
-                    "-" * gap_length
-                )
-
-
-                aligned_sequence.extend(
-
-                    sequence[
-                        seq_position:
-                        seq_start
-                    ]
-                )
-
-
-            # Matching block
-
-            aligned_reference.extend(
-
-                reference[
-                    ref_start:
-                    ref_end
-                ]
-            )
-
-
-            aligned_sequence.extend(
-
-                sequence[
-                    seq_start:
-                    seq_end
-                ]
-            )
-
-
-            ref_position = ref_end
-
-            seq_position = seq_end
-
-
-        # Remaining reference
-
-        if ref_position < len(reference):
-
-            aligned_reference.extend(
-
-                reference[
-                    ref_position:
-                ]
-            )
-
-
-            aligned_sequence.extend(
-
-                "-" *
-                (
-                    len(reference)
-                    - ref_position
-                )
-            )
-
-
-        # Remaining sequence
-
-        if seq_position < len(sequence):
-
-            aligned_reference.extend(
-
-                "-" *
-                (
-                    len(sequence)
-                    - seq_position
-                )
-            )
-
-
-            aligned_sequence.extend(
-
-                sequence[
-                    seq_position:
-                ]
-            )
-
-
-        aligned_sequences.append({
-
-            "name":
-                item["name"],
-
-            "sequence":
-                "".join(
-                    aligned_sequence
-                )
-        })
-
-
-    # Make all sequences equal length
-
-    max_length = max(
-
-        len(item["sequence"])
-
-        for item in aligned_sequences
-    )
-
-
-    for item in aligned_sequences:
-
-        current_length = len(
-            item["sequence"]
+        reference = (
+            rows[0]["sequence"]
+            .replace("-", "")
         )
 
-
-        if current_length < max_length:
-
-            item["sequence"] += (
-
-                "-" *
-                (
-                    max_length -
-                    current_length
-                )
+        new_reference, new_sequence = (
+            pairwise_to_gapped(
+                reference,
+                item["sequence"]
             )
+        )
+
+        rows = merge_alignment(
+            rows,
+            new_reference,
+            new_sequence
+        )
+
+        rows[-1]["name"] = item["name"]
+
+    # Restore names
+    for index, row in enumerate(rows):
+
+        row["name"] = sequences[index]["name"]
+
+    # Same alignment length
+    max_length = max(
+        len(row["sequence"])
+        for row in rows
+    )
+
+    for row in rows:
+
+        row["sequence"] = (
+            row["sequence"]
+            .ljust(
+                max_length,
+                "-"
+            )
+        )
+
+    return rows, None
 
 
-    return aligned_sequences, None
-
-
-# =========================================================
-# ALIGNMENT API
-# =========================================================
+# ============================================================
+# ALIGN API
+# ============================================================
 
 @app.route(
     "/align",
@@ -521,83 +581,56 @@ def align_sequences():
 
     start_time = time.time()
 
+    files = get_uploaded_files()
 
-    if "file" not in request.files:
-
-        return jsonify({
-
-            "success": False,
-
-            "message":
-                "Please upload a FASTA file."
-        })
-
-
-    file = request.files["file"]
-
-
-    try:
-
-        text = file.read().decode(
-            "utf-8"
-        )
-
-    except UnicodeDecodeError:
+    if not files:
 
         return jsonify({
 
             "success": False,
 
             "message":
-                "Invalid FASTA encoding."
-        })
+                "Please upload at least one FASTA file."
 
+        }), 400
 
-    sequences, errors = validate_fasta(
-        text
+    sequences, errors = parse_fasta_files(
+        files
     )
 
-
-    if len(errors) > 0:
+    if not sequences:
 
         return jsonify({
 
             "success": False,
 
-            "errors": errors
-        })
+            "message":
+                "No valid sequences found.",
 
+            "errors":
+                errors
 
-    aligned, alignment_error = create_alignment(
+        }), 400
+
+    aligned, error = create_alignment(
         sequences
     )
 
-
-    if alignment_error:
+    if error:
 
         return jsonify({
 
             "success": False,
 
             "message":
-                alignment_error
-        })
+                error
 
-
-    alignment_length = len(
-
-        aligned[0]["sequence"]
-    )
-
+        }), 400
 
     execution_time = round(
-
-        time.time() -
-        start_time,
-
+        time.time() - start_time,
         4
     )
-
 
     return jsonify({
 
@@ -610,19 +643,23 @@ def align_sequences():
             len(aligned),
 
         "alignment_length":
-            alignment_length,
+            len(aligned[0]["sequence"]),
 
         "execution_time":
             execution_time,
 
         "alignment":
-            aligned
+            aligned,
+
+        "warnings":
+            errors
+
     })
 
 
-# =========================================================
+# ============================================================
 # NEIGHBOR JOINING TREE
-# =========================================================
+# ============================================================
 
 def build_neighbor_joining_tree(
     aligned_sequences
@@ -632,58 +669,42 @@ def build_neighbor_joining_tree(
 
         return (
             None,
-            "At least 3 sequences are required to build a phylogenetic tree."
+            "At least 3 sequences are required."
         )
 
+    records = [
 
-    records = []
-
-
-    for item in aligned_sequences:
-
-        records.append(
-
-            SeqRecord(
-
-                Seq(
-                    item["sequence"]
-                ),
-
-                id=item["name"],
-
-                description=""
-            )
+        SeqRecord(
+            Seq(item["sequence"]),
+            id=item["name"],
+            description=""
         )
 
+        for item in aligned_sequences
+
+    ]
 
     alignment = MultipleSeqAlignment(
         records
     )
 
-
-    # Calculate evolutionary distance
-
     calculator = DistanceCalculator(
         "identity"
     )
 
-
-    distance_matrix = calculator.get_distance(
-        alignment
+    distance_matrix = (
+        calculator.get_distance(
+            alignment
+        )
     )
 
-
-    # Neighbor Joining
-
-    constructor = DistanceTreeConstructor()
-
+    constructor = (
+        DistanceTreeConstructor()
+    )
 
     tree = constructor.nj(
         distance_matrix
     )
-
-
-    # Midpoint rooting
 
     try:
 
@@ -693,31 +714,23 @@ def build_neighbor_joining_tree(
 
         pass
 
-
-    # Convert tree to Newick
-
     output = StringIO()
 
-
     Phylo.write(
-
         tree,
-
         output,
-
         "newick"
     )
 
+    return (
+        output.getvalue(),
+        None
+    )
 
-    newick = output.getvalue()
 
-
-    return newick, None
-
-
-# =========================================================
-# NEIGHBOR JOINING API
-# =========================================================
+# ============================================================
+# TREE API
+# ============================================================
 
 @app.route(
     "/build-tree",
@@ -727,61 +740,39 @@ def build_tree():
 
     start_time = time.time()
 
+    files = get_uploaded_files()
 
-    if "file" not in request.files:
+    if not files:
 
         return jsonify({
 
             "success": False,
 
             "message":
-                "Please upload a FASTA file."
-        })
+                "Please upload FASTA files."
 
+        }), 400
 
-    file = request.files["file"]
+    sequences, errors = parse_fasta_files(
+        files
+    )
 
+    if not sequences:
 
-    try:
+        return jsonify({
 
-        text = file.read().decode(
-            "utf-8"
+            "success": False,
+
+            "errors":
+                errors
+
+        }), 400
+
+    aligned, alignment_error = (
+        create_alignment(
+            sequences
         )
-
-    except UnicodeDecodeError:
-
-        return jsonify({
-
-            "success": False,
-
-            "message":
-                "Invalid FASTA encoding."
-        })
-
-
-    # Validate
-
-    sequences, errors = validate_fasta(
-        text
     )
-
-
-    if len(errors) > 0:
-
-        return jsonify({
-
-            "success": False,
-
-            "errors": errors
-        })
-
-
-    # Alignment
-
-    aligned, alignment_error = create_alignment(
-        sequences
-    )
-
 
     if alignment_error:
 
@@ -791,17 +782,14 @@ def build_tree():
 
             "message":
                 alignment_error
-        })
 
-
-    # NJ tree
+        }), 400
 
     newick, tree_error = (
         build_neighbor_joining_tree(
             aligned
         )
     )
-
 
     if tree_error:
 
@@ -811,17 +799,8 @@ def build_tree():
 
             "message":
                 tree_error
-        })
 
-
-    execution_time = round(
-
-        time.time() -
-        start_time,
-
-        4
-    )
-
+        }), 400
 
     return jsonify({
 
@@ -830,31 +809,32 @@ def build_tree():
         "method":
             "Neighbor Joining",
 
-        "message":
-            "Neighbor Joining tree constructed successfully.",
-
         "number_of_sequences":
             len(aligned),
 
         "execution_time":
-            execution_time,
+            round(
+                time.time() - start_time,
+                4
+            ),
 
         "newick":
-            newick
+            newick,
+
+        "warnings":
+            errors
+
     })
 
 
-# =========================================================
-# START SERVER
-# =========================================================
+# ============================================================
+# RUN
+# ============================================================
 
 if __name__ == "__main__":
 
     app.run(
-
         host="127.0.0.1",
-
         port=5000,
-
         debug=True
     )
