@@ -891,25 +891,27 @@ function getBaseClass(
 // NEIGHBOR JOINING TREE
 // ============================================================
 
+// ============================================================
+// PHASE 2 — HYBRID TREE
+// NEIGHBOR JOINING + MAXIMUM LIKELIHOOD
+// ============================================================
+
 async function buildNJTree() {
 
-    const files =
-        getFiles();
-
+    const files = getFiles();
 
     const resultBox =
-        document.getElementById(
-            "njResult"
-        );
-
+        document.getElementById("njResult");
 
     const button =
-        document.getElementById(
-            "njBtn"
-        );
+        document.getElementById("njBtn");
 
 
-    if (files.length === 0) {
+    // --------------------------------------------------------
+    // CHECK FILES
+    // --------------------------------------------------------
+
+    if (!files || files.length === 0) {
 
         resultBox.innerHTML = `
             <div class="error-box">
@@ -926,21 +928,40 @@ async function buildNJTree() {
         `;
 
         return;
-
     }
 
+
+    // --------------------------------------------------------
+    // DISABLE BUTTON
+    // --------------------------------------------------------
 
     button.disabled = true;
 
 
     resultBox.innerHTML = `
         <div class="loading">
-            Building Neighbor Joining Tree...
+
+            <p>
+                Building Hybrid Phylogenetic Tree...
+            </p>
+
+            <p>
+                Step 1: Neighbor Joining
+            </p>
+
+            <p>
+                Step 2: Maximum Likelihood refinement
+            </p>
+
         </div>
     `;
 
 
     try {
+
+        // ----------------------------------------------------
+        // SEND FASTA FILES TO FLASK
+        // ----------------------------------------------------
 
         const response =
             await fetch(
@@ -951,6 +972,10 @@ async function buildNJTree() {
                 }
             );
 
+
+        // ----------------------------------------------------
+        // CHECK SERVER RESPONSE
+        // ----------------------------------------------------
 
         const data =
             await response.json();
@@ -966,83 +991,379 @@ async function buildNJTree() {
                 (
                     data.errors
                         ? data.errors.join("<br>")
-                        : "Tree construction failed."
+                        : "Hybrid tree construction failed."
                 );
 
 
-            throw new Error(
-                message
-            );
+            throw new Error(message);
+        }
+
+
+        // ====================================================
+        // GET TREE DATA
+        // ====================================================
+
+        /*
+         * The backend may use different names depending on
+         * the current app.py version.
+         *
+         * Therefore we support several possible keys.
+         */
+
+        const njNewick =
+            data.nj_newick ||
+            data.nj_tree ||
+            data.newick ||
+            "";
+
+
+        const mlNewick =
+            data.ml_newick ||
+            data.ml_tree ||
+            data.maximum_likelihood ||
+            "";
+
+
+        const finalNewick =
+            data.final_newick ||
+            data.final_tree ||
+            data.hybrid_newick ||
+            data.hybrid_tree ||
+            mlNewick ||
+            njNewick ||
+            "";
+
+
+        // ----------------------------------------------------
+        // EXECUTION TIME
+        // ----------------------------------------------------
+
+        const executionTime =
+            data.execution_time !== undefined
+                ? data.execution_time
+                : "N/A";
+
+
+        // ----------------------------------------------------
+        // NUMBER OF SEQUENCES
+        // ----------------------------------------------------
+
+        const numberOfSequences =
+            data.number_of_sequences ||
+            files.length;
+
+
+        // ====================================================
+        // BUILD NJ DISPLAY
+        // ====================================================
+
+        let njHTML = "";
+
+        if (njNewick) {
+
+            njHTML = `
+                <div class="tree-stage">
+
+                    <h4>
+                        🌿 Step 1 — Neighbor Joining Tree
+                    </h4>
+
+                    <p class="tree-description">
+                        Fast distance-based initial phylogenetic tree.
+                    </p>
+
+                    <pre class="newick-box">${escapeHTML(
+                        njNewick
+                    )}</pre>
+
+                </div>
+            `;
+
+        }
+        else {
+
+            njHTML = `
+                <div class="tree-stage">
+
+                    <h4>
+                        🌿 Step 1 — Neighbor Joining Tree
+                    </h4>
+
+                    <p>
+                        NJ tree data was not returned by the server.
+                    </p>
+
+                </div>
+            `;
 
         }
 
+
+        // ====================================================
+        // BUILD ML DISPLAY
+        // ====================================================
+
+        let mlHTML = "";
+
+        if (mlNewick) {
+
+            mlHTML = `
+                <div class="tree-stage">
+
+                    <h4>
+                        🧬 Step 2 — Maximum Likelihood Tree
+                    </h4>
+
+                    <p class="tree-description">
+                        The Neighbor Joining topology is evaluated
+                        and refined using Maximum Likelihood.
+                    </p>
+
+                    <pre class="newick-box">${escapeHTML(
+                        mlNewick
+                    )}</pre>
+
+                </div>
+            `;
+
+        }
+        else {
+
+            mlHTML = `
+                <div class="tree-stage">
+
+                    <h4>
+                        🧬 Step 2 — Maximum Likelihood Tree
+                    </h4>
+
+                    <div class="warning-box">
+
+                        <strong>
+                            ML tree not returned
+                        </strong>
+
+                        <p>
+                            The FastTree Maximum Likelihood
+                            result is not present in the server response.
+                        </p>
+
+                    </div>
+
+                </div>
+            `;
+
+        }
+
+
+        // ====================================================
+        // BUILD FINAL HYBRID TREE DISPLAY
+        // ====================================================
+
+        let finalHTML = "";
+
+        if (finalNewick) {
+
+            finalHTML = `
+                <div class="tree-stage final-tree-stage">
+
+                    <h4>
+                        🌳 Final Hybrid Phylogenetic Tree
+                    </h4>
+
+                    <p class="tree-description">
+                        Final tree obtained after combining
+                        Neighbor Joining initialization with
+                        Maximum Likelihood refinement.
+                    </p>
+
+                    <pre class="newick-box final-newick">${escapeHTML(
+                        finalNewick
+                    )}</pre>
+
+                </div>
+            `;
+
+        }
+
+
+        // ====================================================
+        // COMPLETE RESULT
+        // ====================================================
 
         resultBox.innerHTML = `
 
             <div class="result-card">
 
                 <h3>
-                    ✓ Neighbor Joining Tree Generated
+                    ✓ Hybrid Phylogenetic Tree Generated
                 </h3>
 
+
                 <p>
+
                     <strong>
                         Method:
                     </strong>
 
-                    ${data.method}
+                    ${
+                        data.method ||
+                        "Hybrid Neighbor Joining + Maximum Likelihood"
+                    }
+
                 </p>
 
+
                 <p>
+
                     <strong>
                         Sequences:
                     </strong>
 
-                    ${data.number_of_sequences}
+                    ${numberOfSequences}
+
                 </p>
 
+
                 <p>
+
                     <strong>
                         Execution time:
                     </strong>
 
-                    ${data.execution_time}
+                    ${executionTime}
+
                     seconds
+
                 </p>
 
-                <h4>
-                    Newick Representation
-                </h4>
 
-                <pre class="newick-box">
-${escapeHTML(data.newick)}
-                </pre>
+                <!-- ===================================== -->
+                <!-- WORKFLOW -->
+                <!-- ===================================== -->
+
+                <div class="tree-workflow">
+
+                    <div class="workflow-step active">
+                        <span>1</span>
+                        <strong>
+                            Neighbor Joining
+                        </strong>
+                        <small>
+                            Initial tree
+                        </small>
+                    </div>
+
+
+                    <div class="workflow-arrow">
+                        ↓
+                    </div>
+
+
+                    <div class="workflow-step active">
+                        <span>2</span>
+                        <strong>
+                            Maximum Likelihood
+                        </strong>
+                        <small>
+                            Tree refinement
+                        </small>
+                    </div>
+
+
+                    <div class="workflow-arrow">
+                        ↓
+                    </div>
+
+
+                    <div class="workflow-step final">
+                        <span>3</span>
+                        <strong>
+                            Final Hybrid Tree
+                        </strong>
+                        <small>
+                            Final result
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <!-- ===================================== -->
+                <!-- NJ TREE -->
+                <!-- ===================================== -->
+
+                ${njHTML}
+
+
+                <!-- ===================================== -->
+                <!-- ML TREE -->
+                <!-- ===================================== -->
+
+                ${mlHTML}
+
+
+                <!-- ===================================== -->
+                <!-- FINAL TREE -->
+                <!-- ===================================== -->
+
+                ${finalHTML}
 
             </div>
 
         `;
 
 
-        document.getElementById(
-            "summaryTree"
-        ).textContent =
-            "NJ Ready";
+        // ====================================================
+        // UPDATE SUMMARY
+        // ====================================================
 
+        const summaryTree =
+            document.getElementById("summaryTree");
+
+
+        if (summaryTree) {
+
+            summaryTree.textContent =
+                mlNewick
+                    ? "Hybrid Tree Ready"
+                    : "NJ Tree Ready";
+
+        }
+
+
+        // ====================================================
+        // SCROLL TO TREE SECTION
+        // ====================================================
+
+        const treeSection =
+            document.getElementById("tree-section");
+
+
+        if (treeSection) {
+
+            treeSection.scrollIntoView({
+                behavior: "smooth"
+            });
+
+        }
 
     }
+
+
     catch (error) {
 
         console.error(
-            "Tree error:",
+            "Hybrid tree error:",
             error
         );
 
 
         resultBox.innerHTML = `
+
             <div class="error-box">
 
                 <h3>
-                    Tree Construction Error
+                    Hybrid Tree Construction Error
                 </h3>
 
                 <p>
@@ -1052,15 +1373,19 @@ ${escapeHTML(data.newick)}
                 </p>
 
             </div>
+
         `;
 
     }
 
 
+    // --------------------------------------------------------
+    // ENABLE BUTTON AGAIN
+    // --------------------------------------------------------
+
     button.disabled = false;
 
 }
-
 
 // ============================================================
 // ESCAPE HTML
