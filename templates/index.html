@@ -4,725 +4,1050 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>
-        PhyloBuilder | Bioinformatics
-    </title>
+<title>
+PhyloBuilder | Adaptive Phylogenetics
+</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='style.css'
+    ) }}"
+>
 
 </head>
 
-
 <body>
-
 
 <div class="app-container">
 
+<!-- =====================================================
+SIDEBAR
+===================================================== -->
 
-    <!-- ================================================= -->
-    <!-- SIDEBAR -->
-    <!-- ================================================= -->
+<aside class="sidebar">
 
-    <aside class="sidebar">
+<div class="brand">
 
-        <div class="brand">
+<div class="brand-icon">
+🧬
+</div>
 
-            <div class="brand-icon">
-                🧬
-            </div>
+<div>
 
-            <div>
+<h2>
+PhyloBuilder
+</h2>
 
-                <h2>
-                    PhyloBuilder
-                </h2>
+<span>
+Bioinformatics
+</span>
 
-                <span>
-                    Bioinformatics
-                </span>
+</div>
 
-            </div>
+</div>
 
-        </div>
 
+<nav>
 
-        <nav>
+<a href="#home-section">
+🏠 Home
+</a>
 
-            <a href="#home-section">
-                🏠 Home
-            </a>
+<a href="#upload-section">
+↑ Upload
+</a>
 
-            <a href="#upload-section">
-                ↑ Upload
-            </a>
+<a href="#alignment-section">
+≋ Alignment
+</a>
 
-            <a href="#alignment-section">
-                ≋ Alignment
-            </a>
+<a href="#tree-section">
+🌿 Tree Builder
+</a>
 
-            <a href="#tree-section">
-                🌿 Tree Builder
-            </a>
+<a href="#bootstrap-section">
+◈ Bootstrap
+</a>
 
-            <a href="#bootstrap-section">
-                ◈ Bootstrap
-            </a>
+<a href="#visualization-section">
+🔍 Visualization
+</a>
 
-            <a href="#visualization-section">
-                🔍 Visualization
-            </a>
+<a href="#results-section">
+✓ Results
+</a>
 
-        </nav>
+</nav>
 
 
-        <div class="sidebar-footer">
+<div class="sidebar-footer">
 
-            <span class="status-dot"></span>
+<span class="status-dot"></span>
 
-            System Ready
+System Ready
 
-        </div>
+</div>
 
-    </aside>
+</aside>
 
 
+<!-- =====================================================
+MAIN
+===================================================== -->
 
-    <!-- ================================================= -->
-    <!-- MAIN -->
-    <!-- ================================================= -->
+<main class="main-content">
 
-    <main class="main-content">
 
+<!-- =====================================================
+HOME
+===================================================== -->
 
-        <!-- HOME -->
+<section
+    id="home-section"
+    class="hero-section"
+>
 
-        <section
-            id="home-section"
-            class="hero-section"
-        >
+<div class="hero-badge">
+🧬 BIOINFORMATICS PROJECT
+</div>
 
-            <div class="hero-badge">
-                🧬 BIOINFORMATICS PROJECT
-            </div>
+<h1>
 
-            <h1>
-                Hybrid Phylogenetic
-                <span>
-                    Tree Builder
-                </span>
-            </h1>
+Hybrid Phylogenetic
 
-            <p>
+<span>
+Tree Builder
+</span>
 
-                Build phylogenetic trees from
-                DNA, RNA or protein sequences
-                using sequence alignment,
-                fast confidence estimation
-                and interactive visualization.
+</h1>
 
-            </p>
+<p>
 
+Build a phylogenetic tree using
+alignment, separate Neighbor Joining,
+Maximum Likelihood, hybrid refinement,
+adaptive bootstrap confidence and
+interactive visualization.
 
-            <button
-                class="primary-button"
-                onclick="scrollToUpload()"
-            >
+</p>
 
-                Start Analysis →
+<button
+    class="primary-button"
+    onclick="scrollToUpload()"
+>
 
-            </button>
+Start Analysis →
 
-        </section>
+</button>
 
+</section>
 
 
-        <!-- ================================================= -->
-        <!-- UPLOAD -->
-        <!-- ================================================= -->
+<!-- =====================================================
+UPLOAD
+===================================================== -->
 
-        <section
-            id="upload-section"
-            class="content-section"
-        >
+<section
+    id="upload-section"
+    class="content-section"
+>
 
-            <div class="section-heading">
+<div class="section-heading">
 
-                <div class="section-number">
-                    01
-                </div>
+<div class="section-number">
+01
+</div>
 
-                <div>
+<div>
 
-                    <h2>
-                        Sequence Processing
-                    </h2>
+<h2>
+Sequence Processing
+</h2>
 
-                    <p>
-                        Upload one or more FASTA files.
-                    </p>
+<p>
+Upload one or more FASTA files.
+</p>
 
-                </div>
+</div>
 
-            </div>
+</div>
 
 
-            <div class="upload-card">
+<div class="upload-card">
 
+<div class="upload-icon">
+🧬
+</div>
 
-                <div class="upload-icon">
-                    🧬
-                </div>
+<h3>
+Upload FASTA Dataset
+</h3>
 
+<p>
+Select multiple FASTA files if required.
+</p>
 
-                <h3>
-                    Upload FASTA Dataset
-                </h3>
 
+<input
+    type="file"
+    id="fastaFile"
+    accept=".fasta,.fa,.fas"
+    multiple
+    hidden
+>
 
-                <p>
-                    You can select multiple
-                    FASTA files.
-                </p>
 
+<button
+    class="secondary-button"
+    onclick="
+        document
+        .getElementById('fastaFile')
+        .click()
+    "
+>
 
-                <!-- IMPORTANT: multiple -->
+Choose FASTA Files
 
-                <input
-                    type="file"
-                    id="fastaFile"
-                    accept=".fasta,.fa,.fas"
-                    multiple
-                    hidden
-                    onchange="showFileName()"
-                >
+</button>
 
 
-                <button
-                    class="secondary-button"
-                    onclick="
-                        document
-                        .getElementById('fastaFile')
-                        .click()
-                    "
-                >
+<div
+    id="fileName"
+    class="file-name"
+>
 
-                    Choose FASTA Files
+No files selected
 
-                </button>
+</div>
 
 
-                <div
-                    id="fileName"
-                    class="file-name"
-                >
-                    No files selected
-                </div>
+<div
+    id="selectedFiles"
+    class="selected-files"
+>
+</div>
 
 
-                <div
-                    id="selectedFiles"
-                    class="selected-files"
-                >
-                </div>
+<div class="button-row">
 
+<button
+    id="validateBtn"
+    class="primary-button"
+>
 
-                <div class="button-row">
+Validate Sequences ✓
 
+</button>
 
-                    <button
-                        id="validateBtn"
-                        class="primary-button"
-                        onclick="validateFiles()"
-                    >
 
-                        ✓ Validate Sequences
+<button
+    id="alignBtn"
+    class="primary-button"
+    disabled
+>
 
-                    </button>
+Run Alignment
 
+</button>
 
-                    <button
-                        id="alignBtn"
-                        class="primary-button"
-                        onclick="runAlignment()"
-                        disabled
-                    >
+</div>
 
-                        Run Alignment
 
-                    </button>
+<div
+    id="validationStatus"
+>
+</div>
 
 
-                </div>
+<div
+    id="alignmentResult"
+>
+</div>
 
+</div>
 
-                <div
-                    id="validationStatus"
-                >
-                </div>
 
+<div class="stats-grid">
 
-                <div
-                    id="alignmentResult"
-                >
-                </div>
+<div class="stat-card">
 
+<span>
+SEQUENCES
+</span>
 
-            </div>
+<strong id="sequenceCount">
+0
+</strong>
 
+</div>
 
 
-            <!-- STATISTICS -->
+<div class="stat-card">
 
-            <div class="stats-grid">
+<span>
+TYPE
+</span>
 
+<strong id="sequenceType">
+—
+</strong>
 
-                <div class="stat-card">
+</div>
 
-                    <span>
-                        SEQUENCES
-                    </span>
 
-                    <strong id="sequenceCount">
-                        0
-                    </strong>
+<div class="stat-card">
 
-                </div>
+<span>
+TOTAL LENGTH
+</span>
 
+<strong id="totalLength">
+0
+</strong>
 
-                <div class="stat-card">
+</div>
 
-                    <span>
-                        TYPE
-                    </span>
 
-                    <strong id="sequenceType">
-                        —
-                    </strong>
+<div class="stat-card">
 
-                </div>
+<span>
+FILES
+</span>
 
+<strong id="fileCount">
+0
+</strong>
 
-                <div class="stat-card">
+</div>
 
-                    <span>
-                        TOTAL LENGTH
-                    </span>
+</div>
 
-                    <strong id="totalLength">
-                        0
-                    </strong>
+</section>
 
-                </div>
 
+<!-- =====================================================
+ALIGNMENT
+===================================================== -->
 
-                <div class="stat-card">
+<section
+    id="alignment-section"
+    class="content-section"
+>
 
-                    <span>
-                        FILES
-                    </span>
+<div class="section-heading">
 
-                    <strong id="fileCount">
-                        0
-                    </strong>
+<div class="section-number">
+02
+</div>
 
-                </div>
+<div>
 
+<h2>
+Multiple Sequence Alignment
+</h2>
 
-            </div>
+<p>
+Colour-coded conserved and variable positions.
+</p>
 
+</div>
 
-        </section>
+</div>
 
 
+<div class="analysis-card">
 
-        <!-- ================================================= -->
-        <!-- ALIGNMENT -->
-        <!-- ================================================= -->
+<div class="analysis-header">
 
-        <section
-            id="alignment-section"
-            class="content-section"
-        >
+<div>
 
-            <div class="section-heading">
+<h3>
+Alignment Preview
+</h3>
 
-                <div class="section-number">
-                    02
-                </div>
+<p id="alignmentMeta">
 
-                <div>
+Run alignment to display
+the result.
 
-                    <h2>
-                        Multiple Sequence Alignment
-                    </h2>
+</p>
 
-                    <p>
-                        Colour-coded alignment
-                        showing conserved and
-                        variable positions.
-                    </p>
+</div>
 
-                </div>
+<span class="phase-label">
+PHASE 2
+</span>
 
-            </div>
+</div>
 
 
-            <div class="analysis-card">
+<div
+    id="alignmentPreview"
+    class="alignment-preview"
+>
 
+<p>
+Run alignment to display
+the colour-coded alignment.
+</p>
 
-                <div class="analysis-header">
+</div>
 
-                    <div>
 
-                        <h3>
-                            Alignment Preview
-                        </h3>
+<div class="alignment-legend">
 
-                        <p id="alignmentMeta">
-                            Run alignment to display
-                            the result.
-                        </p>
+<span>
+<b class="base-A">A</b>
+Adenine
+</span>
 
-                    </div>
+<span>
+<b class="base-T">T</b>
+Thymine
+</span>
 
-                    <span>
-                        PHASE 2
-                    </span>
+<span>
+<b class="base-G">G</b>
+Guanine
+</span>
 
-                </div>
+<span>
+<b class="base-C">C</b>
+Cytosine
+</span>
 
+<span>
+<b class="base-U">U</b>
+Uracil
+</span>
 
-                <div
-                    id="alignmentPreview"
-                    class="alignment-preview"
-                >
+<span>
+<b class="base-gap">−</b>
+Gap
+</span>
 
-                    <p>
-                        Run alignment to display
-                        the colour-coded alignment.
-                    </p>
+</div>
 
-                </div>
+</div>
 
+</section>
 
-                <!-- LEGEND -->
 
-                <div class="alignment-legend">
+<!-- =====================================================
+TREE BUILDERS
+===================================================== -->
 
-                    <span>
-                        <b class="base-A">A</b>
-                        Adenine
-                    </span>
+<section
+    id="tree-section"
+    class="content-section"
+>
 
-                    <span>
-                        <b class="base-T">T</b>
-                        Thymine
-                    </span>
+<div class="section-heading">
 
-                    <span>
-                        <b class="base-G">G</b>
-                        Guanine
-                    </span>
+<div class="section-number">
+03
+</div>
 
-                    <span>
-                        <b class="base-C">C</b>
-                        Cytosine
-                    </span>
+<div>
 
-                    <span>
-                        <b class="base-U">U</b>
-                        Uracil
-                    </span>
+<h2>
+Phylogenetic Tree Builders
+</h2>
 
-                    <span>
-                        <b class="base-gap">−</b>
-                        Gap
-                    </span>
+<p>
+Build NJ and ML separately,
+then generate the hybrid tree.
+</p>
 
-                </div>
+</div>
 
+</div>
 
-            </div>
 
+<div class="builder-grid">
 
-        </section>
 
+<!-- NJ -->
 
+<div class="method-card">
 
-        <!-- ================================================= -->
-        <!-- NJ TREE -->
-        <!-- ================================================= -->
+<div class="method-icon">
+🌿
+</div>
 
-        <section
-            id="tree-section"
-            class="content-section"
-        >
+<h3>
+Neighbor Joining
+</h3>
 
-            <div class="section-heading">
+<p>
 
-                <div class="section-number">
-                    03
-                </div>
+Distance-based initial tree
+construction from aligned sequences.
 
-                <div>
+</p>
 
-                    <h2>
-                        Phylogenetic Tree
-                    </h2>
 
-                    <p>
-                        Generate an initial
-                        Neighbor Joining tree.
-                    </p>
+<button
+    id="njBtn"
+    class="primary-button"
+    disabled
+>
 
-                </div>
+Build NJ Tree
 
-            </div>
+</button>
 
 
-            <div class="method-card">
+<div id="njStatus">
+</div>
 
 
-                <h3>
-                    🌿 Neighbor Joining
-                </h3>
+<pre
+    id="njNewick"
+    class="newick-box"
+>
 
+NJ tree not built yet.
 
-                <p>
+</pre>
 
-                    Distance-based phylogenetic
-                    tree construction from
-                    aligned sequences.
+</div>
 
-                </p>
 
+<!-- ML -->
 
-                <button
-                    id="njBtn"
-                    class="primary-button"
-                    onclick="buildNJTree()"
-                    disabled
-                >
+<div class="method-card">
 
-                    Build NJ Tree
+<div class="method-icon">
+🧬
+</div>
 
-                </button>
+<h3>
+Maximum Likelihood
+</h3>
 
+<p>
 
-                <div id="njResult">
-                </div>
+Build the ML tree independently
+using FastTree.
 
+</p>
 
-            </div>
 
+<button
+    id="mlBtn"
+    class="primary-button"
+    disabled
+>
 
-        </section>
+Build ML Tree
 
+</button>
 
 
-        <!-- ================================================= -->
-        <!-- BOOTSTRAP -->
-        <!-- ================================================= -->
+<div id="mlStatus">
+</div>
 
-        <section
-            id="bootstrap-section"
-            class="content-section"
-        >
 
-            <div class="section-heading">
+<pre
+    id="mlNewick"
+    class="newick-box"
+>
 
-                <div class="section-number">
-                    04
-                </div>
+ML tree not built yet.
 
-                <div>
+</pre>
 
-                    <h2>
-                        Fast Bootstrap Confidence
-                    </h2>
+</div>
 
-                    <p>
-                        Estimate branch confidence
-                        and identify unreliable
-                        regions.
-                    </p>
+</div>
 
-                </div>
 
-            </div>
+<!-- HYBRID -->
 
+<div class="hybrid-card">
 
-            <div class="coming-card">
+<div class="hybrid-head">
 
-                <h3>
-                    ◈ Fast Bootstrap
-                </h3>
+<div>
 
-                <p>
-                    Bootstrap confidence module
-                    will be connected here.
-                </p>
+<h3>
+03 → Hybrid Tree
+</h3>
 
-            </div>
+<p>
 
-        </section>
+NJ starting topology
+→ Maximum Likelihood refinement.
 
+</p>
 
+</div>
 
-        <!-- ================================================= -->
-        <!-- VISUALIZATION -->
-        <!-- ================================================= -->
 
-        <section
-            id="visualization-section"
-            class="content-section"
-        >
+<button
+    id="hybridBtn"
+    class="primary-button"
+    disabled
+>
 
-            <div class="section-heading">
+Generate Hybrid Tree
 
-                <div class="section-number">
-                    05
-                </div>
+</button>
 
-                <div>
+</div>
 
-                    <h2>
-                        Interactive Visualization
-                    </h2>
 
-                    <p>
-                        Interactive tree visualization
-                        and confidence highlighting.
-                    </p>
+<div id="hybridStatus">
+</div>
 
-                </div>
 
-            </div>
+<pre
+    id="hybridNewick"
+    class="newick-box"
+>
 
+Hybrid tree not generated yet.
 
-            <div class="coming-card">
+</pre>
 
-                <h3>
-                    🌳 Interactive Tree
-                </h3>
+</div>
 
-                <p>
-                    Interactive visualization
-                    will be connected to the
-                    final tree.
-                </p>
+</section>
 
-            </div>
 
-        </section>
+<!-- =====================================================
+BOOTSTRAP
+===================================================== -->
 
+<section
+    id="bootstrap-section"
+    class="content-section"
+>
 
+<div class="section-heading">
 
-        <!-- ================================================= -->
-        <!-- SUMMARY -->
-        <!-- ================================================= -->
+<div class="section-number">
+04
+</div>
 
-        <section
-            class="content-section"
-        >
+<div>
 
-            <div class="section-heading">
+<h2>
+Adaptive Bootstrap Confidence
+</h2>
 
-                <div class="section-number">
-                    06
-                </div>
+<p>
 
-                <div>
+Show initial branch confidence first,
+then add replicates only when required.
 
-                    <h2>
-                        Results
-                    </h2>
+</p>
 
-                </div>
+</div>
 
-            </div>
+</div>
 
 
-            <div class="stats-grid">
+<div class="bootstrap-card">
 
 
-                <div class="stat-card">
+<div class="bootstrap-heading">
 
-                    <span>
-                        SEQUENCES
-                    </span>
+<h3>
+◇ Adaptive Bootstrap
+</h3>
 
-                    <strong id="summarySequences">
-                        —
-                    </strong>
+<p>
 
-                </div>
+Round 1 calculates branch confidence.
+If more sampling is required,
+Round 2 runs automatically.
 
+The final result does not show
+an R1-vs-R2 comparison.
 
-                <div class="stat-card">
+</p>
 
-                    <span>
-                        ALIGNMENT
-                    </span>
+</div>
 
-                    <strong id="summaryAlignment">
-                        —
-                    </strong>
 
-                </div>
+<div class="bootstrap-controls">
 
 
-                <div class="stat-card">
+<div class="control-group">
 
-                    <span>
-                        BOOTSTRAP
-                    </span>
+<label>
+Initial Replicates
+</label>
 
-                    <strong>
-                        Next
-                    </strong>
+<input
+    type="number"
+    id="initialReplicates"
+    value="100"
+    min="10"
+    max="1000"
+>
 
-                </div>
+</div>
 
 
-                <div class="stat-card">
+<div class="control-group">
 
-                    <span>
-                        TREE
-                    </span>
+<label>
+Batch Size
+</label>
 
-                    <strong id="summaryTree">
-                        —
-                    </strong>
+<input
+    type="number"
+    id="batchSize"
+    value="100"
+    min="10"
+    max="500"
+>
 
-                </div>
+</div>
 
 
-            </div>
+<div class="control-group">
 
+<label>
+Maximum Replicates
+</label>
 
-        </section>
+<input
+    type="number"
+    id="maxReplicates"
+    value="1000"
+    min="100"
+    max="2000"
+>
 
+</div>
 
-    </main>
+
+<div class="control-group">
+
+<label>
+Stability Threshold (%)
+</label>
+
+<input
+    type="number"
+    id="stabilityThreshold"
+    value="2"
+    min="0.1"
+    max="20"
+    step="0.1"
+>
+
+</div>
+
+</div>
+
+
+<button
+    id="bootstrapBtn"
+    class="primary-button"
+    disabled
+>
+
+Run Adaptive Bootstrap
+
+</button>
+
+
+<div
+    id="bootstrapStatus"
+    class="bootstrap-status"
+>
+
+Build the hybrid tree before
+running bootstrap.
+
+</div>
+
+
+<div
+    id="bootstrapRound1"
+    class="bootstrap-round"
+>
+</div>
+
+
+<div
+    id="bootstrapRound2"
+    class="bootstrap-round"
+>
+</div>
+
+
+<div
+    id="bootstrapResult"
+    class="bootstrap-result"
+>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+INTERACTIVE VISUALIZATION
+===================================================== -->
+
+<section
+    id="visualization-section"
+    class="content-section"
+>
+
+<div class="section-heading">
+
+<div class="section-number">
+05
+</div>
+
+<div>
+
+<h2>
+Interactive Visualization
+</h2>
+
+<p>
+Explore the hybrid tree and
+click branches to inspect confidence.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="visualization-card">
+
+
+<div class="viz-toolbar">
+
+<div>
+
+<h3>
+🌳 Interactive Hybrid Tree
+</h3>
+
+<p id="vizHint">
+
+Generate the hybrid tree
+to visualize it.
+
+</p>
+
+</div>
+
+
+<div class="viz-actions">
+
+<button
+    id="zoomOutBtn"
+    class="small-button"
+>
+
+−
+
+</button>
+
+
+<button
+    id="zoomResetBtn"
+    class="small-button"
+>
+
+Reset
+
+</button>
+
+
+<button
+    id="zoomInBtn"
+    class="small-button"
+>
+
++
+
+</button>
+
+</div>
+
+</div>
+
+
+<div class="tree-legend">
+
+<span>
+<i class="legend-line high"></i>
+High ≥ 80%
+</span>
+
+<span>
+<i class="legend-line moderate"></i>
+Moderate 50–79%
+</span>
+
+<span>
+<i class="legend-line low"></i>
+Low &lt; 50%
+</span>
+
+<span>
+<i class="legend-line neutral"></i>
+Not evaluated
+</span>
+
+</div>
+
+
+<div
+    id="treeCanvas"
+    class="tree-canvas"
+>
+
+<div class="empty-viz">
+
+The interactive tree will appear
+after hybrid tree generation.
+
+</div>
+
+</div>
+
+
+<div
+    id="branchDetails"
+    class="branch-details"
+>
+
+Click an internal node to view
+branch confidence.
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+RESULTS
+===================================================== -->
+
+<section
+    id="results-section"
+    class="content-section"
+>
+
+<div class="section-heading">
+
+<div class="section-number">
+06
+</div>
+
+<div>
+
+<h2>
+Results
+</h2>
+
+<p>
+Final project summary.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="stats-grid">
+
+
+<div class="stat-card">
+
+<span>
+SEQUENCES
+</span>
+
+<strong id="summarySequences">
+—
+</strong>
+
+</div>
+
+
+<div class="stat-card">
+
+<span>
+ALIGNMENT
+</span>
+
+<strong id="summaryAlignment">
+—
+</strong>
+
+</div>
+
+
+<div class="stat-card">
+
+<span>
+BOOTSTRAP
+</span>
+
+<strong id="summaryBootstrap">
+Next
+</strong>
+
+</div>
+
+
+<div class="stat-card">
+
+<span>
+TREE
+</span>
+
+<strong id="summaryTree">
+—
+</strong>
+
+</div>
+
+</div>
+
+
+<div id="finalResults">
+</div>
+
+</section>
+
+</main>
 
 </div>
 
 
 <script
-    src="{{ url_for('static', filename='script.js') }}"
+    src="{{ url_for(
+        'static',
+        filename='script.js'
+    ) }}"
 ></script>
-
 
 </body>
 

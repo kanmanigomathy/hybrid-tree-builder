@@ -1,645 +1,1675 @@
-/* =========================================================
-   PHYLOBUILDER STYLE
-   ========================================================= */
-
 * {
     box-sizing: border-box;
 }
-
 
 html {
     scroll-behavior: smooth;
 }
 
-
 body {
+
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
     background: #f4f7fb;
+
     color: #12233f;
 }
 
 
-.app-container {
-    display: flex;
-    min-height: 100vh;
+button,
+input {
+    font: inherit;
 }
 
 
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
+button {
+    border: 0;
+    cursor: pointer;
+}
+
+
+button:disabled {
+
+    opacity: 0.5;
+
+    cursor: not-allowed;
+
+}
+
+
+/* ============================================================
+SIDEBAR
+============================================================ */
+
+.app-container {
+
+    display: flex;
+
+    min-height: 100vh;
+
+}
+
 
 .sidebar {
+
     width: 240px;
+
     background: #101b2d;
+
     color: white;
+
     padding: 25px 20px;
+
     position: fixed;
+
     left: 0;
+
     top: 0;
+
     bottom: 0;
+
+    z-index: 5;
+
 }
 
 
 .brand {
+
     display: flex;
+
     gap: 12px;
+
     align-items: center;
+
     margin-bottom: 45px;
+
 }
 
 
 .brand-icon {
+
     font-size: 32px;
+
 }
 
 
 .brand h2 {
+
     margin: 0;
+
 }
 
 
 .brand span {
+
     color: #8fa2bd;
+
     font-size: 13px;
+
 }
 
 
 .sidebar nav {
+
     display: flex;
+
     flex-direction: column;
+
     gap: 8px;
+
 }
 
 
 .sidebar nav a {
+
     color: #dbe5f2;
+
     text-decoration: none;
+
     padding: 13px;
+
     border-radius: 10px;
+
 }
 
 
 .sidebar nav a:hover {
+
     background: #1c987f;
+
 }
 
 
 .sidebar-footer {
+
     position: absolute;
+
     bottom: 25px;
+
     color: #9aabc0;
+
 }
 
 
 .status-dot {
+
     display: inline-block;
+
     width: 9px;
+
     height: 9px;
+
     background: #32c79e;
+
     border-radius: 50%;
+
     margin-right: 7px;
+
 }
 
 
-/* =========================================================
-   MAIN
-   ========================================================= */
+/* ============================================================
+MAIN
+============================================================ */
 
 .main-content {
+
     margin-left: 240px;
-    width: calc(100% - 240px);
+
+    width: calc(
+        100% - 240px
+    );
+
     padding: 45px;
+
 }
 
 
 .hero-section {
+
     max-width: 1000px;
+
     margin: auto;
+
     padding: 60px 20px;
+
     text-align: center;
+
 }
 
 
 .hero-badge {
+
     display: inline-block;
+
     background: #e2f5f0;
+
     color: #168b74;
+
     padding: 10px 18px;
+
     border-radius: 25px;
+
     font-weight: bold;
+
 }
 
 
 .hero-section h1 {
+
     font-size: 48px;
+
     margin: 25px 0 15px;
+
 }
 
 
 .hero-section h1 span {
+
     color: #209a82;
+
 }
 
 
 .hero-section p {
+
     color: #70819b;
+
     font-size: 18px;
+
     line-height: 1.7;
-    max-width: 750px;
-    margin: auto auto 25px;
+
+    max-width: 780px;
+
+    margin:
+        auto
+        auto
+        25px;
+
 }
 
 
-/* =========================================================
-   SECTIONS
-   ========================================================= */
-
 .content-section {
+
     max-width: 1100px;
+
     margin: 50px auto;
+
 }
 
 
 .section-heading {
+
     display: flex;
+
     gap: 18px;
+
     align-items: center;
+
     margin-bottom: 25px;
+
 }
 
 
 .section-number {
+
     background: #209a82;
+
     color: white;
+
     padding: 12px 15px;
+
     border-radius: 10px;
+
     font-weight: bold;
+
+    min-width: 55px;
+
+    text-align: center;
+
 }
 
 
 .section-heading h2 {
-    margin: 0 0 5px;
+
+    margin:
+        0
+        0
+        5px;
+
 }
 
 
 .section-heading p {
+
     margin: 0;
+
     color: #7889a0;
+
 }
 
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-button {
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-}
-
+/* ============================================================
+BUTTONS
+============================================================ */
 
 .primary-button {
+
     background: #209a82;
+
     color: white;
-    padding: 14px 25px;
+
+    padding:
+        14px
+        25px;
+
     border-radius: 10px;
+
+    font-weight: bold;
+
 }
 
 
 .primary-button:hover {
+
     background: #17816c;
-}
 
-
-.primary-button:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
 }
 
 
 .secondary-button {
+
     background: #eaf0f7;
+
     color: #16314f;
-    padding: 15px 25px;
+
+    padding:
+        15px
+        25px;
+
     border-radius: 10px;
+
+    font-weight: bold;
+
+}
+
+
+.small-button {
+
+    background: #eaf0f7;
+
+    color: #16314f;
+
+    padding:
+        9px
+        14px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
 }
 
 
 .button-row {
+
     display: flex;
+
     justify-content: center;
+
     gap: 15px;
+
     margin-top: 20px;
+
     flex-wrap: wrap;
+
 }
 
 
-/* =========================================================
-   UPLOAD
-   ========================================================= */
+/* ============================================================
+CARDS
+============================================================ */
+
+.upload-card,
+.analysis-card,
+.method-card,
+.hybrid-card,
+.bootstrap-card,
+.visualization-card {
+
+    background: white;
+
+    border:
+        1px
+        solid
+        #dce4ee;
+
+    border-radius: 20px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 10px
+        30px
+        rgba(
+            20,
+            40,
+            70,
+            .05
+        );
+
+}
+
 
 .upload-card {
-    background: white;
-    border: 1px solid #dce4ee;
-    border-radius: 20px;
-    padding: 45px;
+
     text-align: center;
-    box-shadow: 0 10px 30px rgba(20, 40, 70, 0.06);
+
+    padding: 45px;
+
 }
 
 
 .upload-icon {
+
     font-size: 45px;
+
 }
 
 
 .upload-card h3 {
+
     font-size: 28px;
+
 }
 
 
-.upload-card p {
+.upload-card p,
+.method-card p,
+.hybrid-card p,
+.bootstrap-card p {
+
     color: #71829a;
+
 }
 
 
-.file-name {
-    margin-top: 18px;
-    color: #526782;
-}
-
-
-.selected-files {
-    margin-top: 12px;
-}
-
-
-.file-chip {
-    display: inline-block;
-    background: #edf5f3;
-    color: #197d69;
-    padding: 7px 12px;
-    border-radius: 20px;
-    margin: 4px;
-    font-size: 13px;
-}
-
-
-/* =========================================================
-   STATISTICS
-   ========================================================= */
+/* ============================================================
+STATISTICS
+============================================================ */
 
 .stats-grid {
+
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+
+    grid-template-columns:
+        repeat(
+            4,
+            1fr
+        );
+
     gap: 18px;
+
     margin-top: 25px;
+
 }
 
 
 .stat-card {
+
     background: white;
-    border: 1px solid #dce4ee;
+
+    border:
+        1px
+        solid
+        #dce4ee;
+
     border-radius: 16px;
+
     padding: 25px;
+
     text-align: center;
+
 }
 
 
 .stat-card span {
+
     display: block;
+
     color: #7a8ba2;
+
     font-size: 13px;
+
     font-weight: bold;
+
     letter-spacing: 1px;
+
 }
 
 
 .stat-card strong {
+
     display: block;
+
     font-size: 30px;
+
     margin-top: 12px;
+
 }
 
 
-/* =========================================================
-   STATUS BOXES
-   ========================================================= */
+/* ============================================================
+STATUS
+============================================================ */
 
 .success-box {
+
     background: #eaf8f4;
-    border: 1px solid #a8dfd2;
+
+    border:
+        1px
+        solid
+        #a8dfd2;
+
     color: #167561;
+
     border-radius: 15px;
+
     padding: 20px;
-    margin-top: 25px;
+
+    margin-top: 18px;
+
     text-align: left;
+
 }
 
 
 .error-box {
+
     background: #fff0f0;
-    border: 1px solid #f2aaaa;
+
+    border:
+        1px
+        solid
+        #f2aaaa;
+
     color: #b22c2c;
+
     border-radius: 15px;
+
     padding: 20px;
-    margin-top: 25px;
+
+    margin-top: 18px;
+
     text-align: left;
+
 }
 
 
 .loading {
+
     background: #eef4fa;
-    padding: 25px;
+
+    padding: 18px;
+
     border-radius: 12px;
+
     color: #60738e;
+
+    margin-top: 15px;
+
 }
 
 
-/* =========================================================
-   ALIGNMENT CARD
-   ========================================================= */
+.loading.compact {
 
-.analysis-card {
-    background: white;
-    border: 1px solid #dce4ee;
+    padding: 12px;
+
+    font-size: 14px;
+
+}
+
+
+/* ============================================================
+FILES
+============================================================ */
+
+.file-name {
+
+    margin-top: 18px;
+
+    color: #526782;
+
+}
+
+
+.selected-files {
+
+    margin-top: 12px;
+
+}
+
+
+.file-chip {
+
+    display: inline-block;
+
+    background: #edf5f3;
+
+    color: #197d69;
+
+    padding:
+        7px
+        12px;
+
     border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(20, 40, 70, 0.05);
+
+    margin: 4px;
+
+    font-size: 13px;
+
 }
 
+
+/* ============================================================
+ALIGNMENT
+============================================================ */
 
 .analysis-header {
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
+    gap: 18px;
+
 }
 
 
-.analysis-header h3 {
-    margin-bottom: 5px;
-}
+.phase-label {
 
+    font-size: 12px;
 
-.analysis-header p {
-    color: #7b8ba0;
+    font-weight: bold;
+
+    color: #1b8b74;
+
 }
 
 
 .alignment-preview {
+
     margin-top: 25px;
+
     background: #101a2b;
+
     color: white;
+
     border-radius: 14px;
+
     padding: 20px;
-    overflow-x: auto;
+
+    overflow: auto;
+
 }
 
 
-/* =========================================================
-   ALIGNMENT
-   ========================================================= */
-
 .alignment-container {
+
     min-width: max-content;
-    font-family: "Courier New", monospace;
+
+    font-family:
+        "Courier New",
+        monospace;
+
 }
 
 
 .alignment-row {
+
     display: flex;
+
     align-items: center;
+
     min-height: 32px;
+
 }
 
 
 .sequence-name {
+
     width: 150px;
+
     min-width: 150px;
+
     padding-right: 15px;
+
     color: #d8e3f1;
+
     font-weight: bold;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
+
     white-space: nowrap;
+
 }
 
 
 .sequence-track {
+
     display: flex;
+
 }
 
 
 .base,
 .consensus-char {
+
     display: inline-flex;
+
     align-items: center;
+
     justify-content: center;
+
     width: 25px;
+
     min-width: 25px;
+
     height: 28px;
+
     margin-right: 1px;
+
     border-radius: 3px;
+
     font-weight: bold;
+
 }
 
 
-/* =========================================================
-   DNA/RNA COLOURS
-   ========================================================= */
-
 .base-A {
+
     background: #42c983;
+
     color: white;
+
 }
 
 
 .base-T {
+
     background: #e45b65;
+
     color: white;
+
 }
 
 
 .base-G {
+
     background: #e7a52d;
+
     color: white;
+
 }
 
 
 .base-C {
+
     background: #4f8edb;
+
     color: white;
+
 }
 
 
 .base-U {
+
     background: #9564c8;
+
     color: white;
+
 }
 
 
 .base-gap {
+
     background: #566276;
+
     color: #d8deea;
+
 }
 
 
 .base-other {
+
     background: #777f91;
+
     color: white;
+
 }
 
 
 .conserved {
-    outline: 2px solid white;
-    box-shadow: 0 0 0 1px #ffffff;
+
+    outline:
+        2px
+        solid
+        white;
+
+    box-shadow:
+        0 0 0 1px white;
+
 }
 
 
 .consensus-row {
+
     margin-bottom: 12px;
+
     padding-bottom: 10px;
-    border-bottom: 1px solid #435069;
+
+    border-bottom:
+        1px
+        solid
+        #435069;
+
 }
 
 
 .consensus-char {
+
     background: #27344b;
+
     color: #70dfc1;
+
 }
 
 
-/* =========================================================
-   LEGEND
-   ========================================================= */
-
 .alignment-legend {
+
     display: flex;
+
     flex-wrap: wrap;
+
     gap: 15px;
+
     margin-top: 20px;
+
     color: #667990;
+
 }
 
 
 .alignment-legend span {
+
     display: flex;
+
     align-items: center;
+
     gap: 5px;
+
 }
 
 
 .alignment-legend b {
+
     width: 25px;
+
     height: 25px;
+
     display: inline-flex;
+
     align-items: center;
+
     justify-content: center;
+
     border-radius: 4px;
+
 }
 
 
-/* =========================================================
-   TREE
-   ========================================================= */
+/* ============================================================
+TREE BUILDERS
+============================================================ */
 
-.method-card,
-.coming-card {
-    background: white;
-    border: 1px solid #dce4ee;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(20, 40, 70, 0.05);
+.builder-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    gap: 20px;
+
 }
 
 
-.method-card h3,
-.coming-card h3 {
-    margin-top: 0;
+.method-icon {
+
+    font-size: 28px;
+
+}
+
+
+.method-card h3 {
+
+    margin:
+        8px
+        0;
+
+}
+
+
+.hybrid-card {
+
+    margin-top: 20px;
+
+    border-left:
+        5px
+        solid
+        #209a82;
+
+}
+
+
+.hybrid-head {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 18px;
+
 }
 
 
 .newick-box {
+
     background: #111a2a;
+
     color: #8de2cd;
-    padding: 20px;
+
+    padding: 18px;
+
     border-radius: 12px;
-    overflow-x: auto;
+
+    overflow: auto;
+
     white-space: pre-wrap;
-    word-break: break-all;
+
+    word-break: break-word;
+
+    min-height: 80px;
+
 }
 
 
-.result-card {
-    background: #f5f9fc;
-    border-radius: 15px;
-    padding: 20px;
+/* ============================================================
+BOOTSTRAP
+============================================================ */
+
+.bootstrap-controls {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            1fr
+        );
+
+    gap: 18px;
+
+    margin:
+        20px
+        0;
+
+}
+
+
+.control-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+    color: #46546b;
+
+}
+
+
+.control-group input {
+
+    width: 100%;
+
+    padding:
+        13px
+        14px;
+
+    border:
+        1px
+        solid
+        #d7dee8;
+
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+}
+
+
+.bootstrap-status {
+
     margin-top: 20px;
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    background: #f4f7fa;
+
+    color: #657287;
+
 }
 
 
-.result-card h3 {
-    color: #18866f;
+.round-card {
+
+    margin-top: 20px;
+
+    border-radius: 16px;
+
+    padding: 22px;
+
+    border:
+        1px
+        solid
+        #dce4ee;
+
+    background: #fbfdff;
+
 }
 
 
-.coming-card {
-    text-align: center;
+.round-card.initial {
+
+    border-left:
+        5px
+        solid
+        #249b84;
+
 }
 
 
-.coming-card p {
-    color: #72839a;
+.round-card.final-round {
+
+    border-left:
+        5px
+        solid
+        #2b78b5;
+
 }
 
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+.round-pill {
 
-@media (
-    max-width: 900px
-) {
+    display: inline-block;
+
+    padding:
+        5px
+        9px;
+
+    border-radius: 20px;
+
+    background: #e2f5f0;
+
+    color: #168b74;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+}
+
+
+.round-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 18px;
+
+}
+
+
+.result-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            1fr
+        );
+
+    gap: 15px;
+
+    margin-top: 18px;
+
+}
+
+
+.compact-grid {
+
+    grid-template-columns:
+        repeat(
+            3,
+            1fr
+        );
+
+}
+
+
+.result-item {
+
+    background: white;
+
+    border:
+        1px
+        solid
+        #e2e7ee;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+}
+
+
+.result-item span {
+
+    display: block;
+
+    color: #718099;
+
+    font-size: 12px;
+
+}
+
+
+.result-item strong {
+
+    display: block;
+
+    font-size: 22px;
+
+    margin-top: 8px;
+
+}
+
+
+/* ============================================================
+BRANCH TABLE
+============================================================ */
+
+.branch-table-wrap {
+
+    overflow: auto;
+
+    margin-top: 18px;
+
+}
+
+
+.branch-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: white;
+
+}
+
+
+.branch-table th,
+.branch-table td {
+
+    padding:
+        11px
+        12px;
+
+    border-bottom:
+        1px
+        solid
+        #e5eaf0;
+
+    text-align: left;
+
+}
+
+
+.branch-table th {
+
+    font-size: 12px;
+
+    color: #64738a;
+
+    text-transform: uppercase;
+
+}
+
+
+.confidence-badge {
+
+    display: inline-block;
+
+    padding:
+        4px
+        9px;
+
+    border-radius: 15px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+}
+
+
+.confidence-badge.high {
+
+    background: #e6f6ef;
+
+    color: #167761;
+
+}
+
+
+.confidence-badge.moderate {
+
+    background: #fff4dc;
+
+    color: #9b6914;
+
+}
+
+
+.confidence-badge.low {
+
+    background: #ffe8e8;
+
+    color: #b23b3b;
+
+}
+
+
+.bootstrap-warning {
+
+    background: #fff4f0;
+
+    border:
+        1px
+        solid
+        #efc4b8;
+
+    color: #9e4435;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    margin-top: 18px;
+
+}
+
+
+.success-text {
+
+    color: #17876f;
+
+}
+
+
+/* ============================================================
+INTERACTIVE TREE
+============================================================ */
+
+.visualization-card {
+
+    overflow: hidden;
+
+}
+
+
+.viz-toolbar {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 18px;
+
+}
+
+
+.viz-actions {
+
+    display: flex;
+
+    gap: 7px;
+
+}
+
+
+.tree-legend {
+
+    display: flex;
+
+    gap: 18px;
+
+    flex-wrap: wrap;
+
+    margin:
+        15px
+        0;
+
+    color: #657287;
+
+    font-size: 13px;
+
+}
+
+
+.legend-line {
+
+    display: inline-block;
+
+    width: 26px;
+
+    height: 4px;
+
+    border-radius: 4px;
+
+    margin-right: 6px;
+
+}
+
+
+.legend-line.high {
+
+    background: #238b70;
+
+}
+
+
+.legend-line.moderate {
+
+    background: #d18b1f;
+
+}
+
+
+.legend-line.low {
+
+    background: #d44a4a;
+
+}
+
+
+.legend-line.neutral {
+
+    background: #7a8798;
+
+}
+
+
+.tree-canvas {
+
+    background: white;
+
+    border:
+        1px
+        solid
+        #e1e7ef;
+
+    border-radius: 14px;
+
+    overflow: auto;
+
+    min-height: 420px;
+
+    padding: 12px;
+
+}
+
+
+.tree-canvas svg {
+
+    width: 100%;
+
+    min-width: 760px;
+
+    height: auto;
+
+    display: block;
+
+}
+
+
+.tree-branch {
+
+    stroke-width: 3;
+
+    fill: none;
+
+}
+
+
+.tree-node {
+
+    stroke: white;
+
+    stroke-width: 2;
+
+    cursor: pointer;
+
+}
+
+
+.tree-node.high {
+
+    fill: #238b70;
+
+}
+
+
+.tree-node.moderate {
+
+    fill: #d18b1f;
+
+}
+
+
+.tree-node.low {
+
+    fill: #d44a4a;
+
+}
+
+
+.tree-node.neutral {
+
+    fill: #7a8798;
+
+}
+
+
+.leaf-label {
+
+    font-size: 15px;
+
+    fill: #24344c;
+
+}
+
+
+.support-label {
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    fill: #42546c;
+
+}
+
+
+.branch-details {
+
+    margin-top: 15px;
+
+    background: #f5f9fc;
+
+    border:
+        1px
+        solid
+        #dce4ee;
+
+    border-radius: 12px;
+
+    padding: 16px;
+
+    color: #52647c;
+
+    min-height: 70px;
+
+}
+
+
+.detail-title {
+
+    font-weight: bold;
+
+    color: #1c806d;
+
+}
+
+
+.detail-value {
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    color: #1b304e;
+
+    margin-top: 5px;
+
+}
+
+
+.empty-viz {
+
+    min-height: 390px;
+
+    display: grid;
+
+    place-items: center;
+
+    color: #7c899c;
+
+}
+
+
+/* ============================================================
+RESPONSIVE
+============================================================ */
+
+@media(max-width:1100px) {
+
+    .bootstrap-controls {
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+    .result-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+}
+
+
+@media(max-width:900px) {
 
     .sidebar {
-        display: none;
-    }
 
+        display: none;
+
+    }
 
     .main-content {
-        margin-left: 0;
-        width: 100%;
-        padding: 20px;
-    }
 
+        margin-left: 0;
+
+        width: 100%;
+
+        padding: 20px;
+
+    }
 
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
     }
 
-
     .hero-section h1 {
+
         font-size: 36px;
+
+    }
+
+    .builder-grid {
+
+        grid-template-columns:
+            1fr;
+
     }
 
 }
 
 
-@media (
-    max-width: 550px
-) {
+@media(max-width:650px) {
 
-    .stats-grid {
-        grid-template-columns: 1fr;
+    .stats-grid,
+    .bootstrap-controls,
+    .result-grid,
+    .compact-grid {
+
+        grid-template-columns:
+            1fr;
+
     }
 
-
     .upload-card {
+
         padding: 25px;
+
+    }
+
+    .analysis-header,
+    .hybrid-head,
+    .viz-toolbar,
+    .round-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+    .tree-canvas svg {
+
+        min-width: 650px;
+
     }
 
 }
